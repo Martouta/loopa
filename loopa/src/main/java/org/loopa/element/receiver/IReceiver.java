@@ -22,5 +22,5 @@ package org.loopa.element.receiver;
 import org.loopa.generic.element.component.ILoopAElementComponent;
 
 public interface IReceiver extends ILoopAElementComponent{
-
+  public void doOperation(IMessage message);
 }
