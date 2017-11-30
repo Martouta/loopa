@@ -28,5 +28,6 @@ public class Receiver extends AReceiver{
 		// TODO Auto-generated constructor stub
 	}
 
+	public void doOperation(IMessage message) {}
 
 }
