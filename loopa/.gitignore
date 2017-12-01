@@ -53,10 +53,10 @@ local.properties
 .worksheet
 
 ### Eclipse Patch ###
-# Eclipse Core		
+# Eclipse Core
 .project
 
-# JDT-specific (Eclipse Java Development Tools)		
+# JDT-specific (Eclipse Java Development Tools)
 .classpath
 
 ### Java ###
@@ -99,8 +99,8 @@ hs_err_pid*
 .nfs*
 
 ### Gradle ###
-.gradle
-**/build/
+*/.gradle/
+*/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
@@ -115,3 +115,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 # End of https://www.gitignore.io/api/java,linux,gradle,eclipse
+/target/
