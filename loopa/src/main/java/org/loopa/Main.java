@@ -45,8 +45,8 @@ import org.loopa.comm.message.IMessage;
 public class Main {
     private final static String DEFAULT_KAFKA_URL = "147.83.192.53";
     private final static String DEFAULT_KAFKA_TOPIC = "68d24960-5eff-4c14-8a8c-6d0c7f8ea5c3";
-    // TODO: try catch
-    public static void main(String[] args) throws InterruptedException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    
+    public static void main(String[] args) {
         String kafkaUrl = DEFAULT_KAFKA_URL;
         String kafkaTopic = DEFAULT_KAFKA_TOPIC;
         if (args.length > 0) {

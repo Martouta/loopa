@@ -56,7 +56,7 @@ public class KafkaService {
         producer.close();
     }
 
-    public void readMessages(Class dataItemClass, IReceiver receiver) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void readMessages(Class dataItemClass, IReceiver receiver) {
         Properties properties = createConsumerProperties();
         ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(properties));
         testConsumer(consumer, dataItemClass, receiver);
@@ -69,7 +69,7 @@ public class KafkaService {
       // acabara haciewndo request al readmessage
     }
 
-    private void testConsumer(ConsumerConnector consumer, Class dataItemClass, IReceiver receiver) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private void testConsumer(ConsumerConnector consumer, Class dataItemClass, IReceiver receiver) {
         Map<String, Integer> topicCount = new HashMap<>();
         topicCount.put(kafkaTopic, 1);
 
@@ -85,7 +85,7 @@ public class KafkaService {
         }
     }
 
-    private ObtainedData getObtainedDataFromMessage(String message, Class dataItemClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    private ObtainedData getObtainedDataFromMessage(String message, Class dataItemClass) {
       JSONObject jsonDataObject  = new JSONObject(message); // json with all data
       JSONObject twitterData = jsonDataObject.getJSONObject("SocialNetworksMonitoredData"); // get SocialNetworksMonitoredData object (twitterCase)
       int configId = twitterData.getInt("confId");
@@ -94,12 +94,21 @@ public class KafkaService {
       Timestamp searchTimeStamp = Timestamp.valueOf( twitterData.getString("searchTimeStamp") );
       ObtainedData od = new ObtainedData(configId, numDataItems, idOutput, searchTimeStamp);
       JSONArray dataItemsArray = twitterData.getJSONArray("DataItems");
-      for (int i = 0; i < numDataItems; i++) {
+      try {
+        Method fromJSONObjectMethod = dataItemClass.getMethod("fromJSONObject", JSONObject.class);
+        for (int i = 0; i < numDataItems; i++) {
           JSONObject jsonDataItem = (JSONObject) dataItemsArray.get(0);
-          Method fromJSONObjectMethod = dataItemClass.getMethod("fromJSONObject", JSONObject.class);
           DataItem dataItem = (DataItem) fromJSONObjectMethod.invoke(null, jsonDataItem);
           od.addDataItem(dataItem);
+        }
+      } catch (IllegalAccessException e) {
+        System.err.println("IllegalAccessException: " + e.getMessage());
+      } catch (NoSuchMethodException e) {
+        System.err.println("NoSuchMethodException: " + e.getMessage());
+      } catch (InvocationTargetException e) {
+        System.err.println("InvocationTargetException: " + e.getMessage());
       }
+
       return od;
     }
 }
