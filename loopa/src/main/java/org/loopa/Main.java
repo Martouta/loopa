@@ -134,7 +134,21 @@ public class Main {
     		sP.addListerner(sMS);
         ISender s = new Sender("senderTwitter", sPM, sMS);
 
-        IMonitor m = new Monitor("MonitorPersistenceOperation", r, ls, fl, null, mc, s, null);
+        // AdaptationLogic (empty)
+        IPolicy alP = new Policy("adaptationLogicTwitter", new HashMap<String, String>());
+        IPolicyManager alPM = new PolicyManager(alP);
+        IAdaptationLogicEnactor alE = new AdaptationLogicEnactor();
+        alP.addListerner(alE);
+        IAdaptationLogic al = new AdaptationLogic("adaptationLogicTwitter", alPM, alE);
+
+        // KnowledgeManager (empty)
+        IPolicy kP = new Policy("knowledgeManagerTwitter", new HashMap<String, String>());
+        IPolicyManager kPM = new PolicyManager(kP);
+        IAdaptiveKnowledgeManager kAKM = new AdaptiveKnowledgeManager();
+        kP.addListerner(kAKM);
+        IKnowledgeManager k = new KnowledgeManager("kwonledgeManagerTwitter", kPM, kAKM);
+
+        IMonitor m = new Monitor("MonitorPersistenceOperation", r, ls, fl, al, mc, s, k);
         // TODO: m.getReceiver --> doOperation
 
         // // Run kafkaService reader and send messages to the receiver
