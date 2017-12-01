@@ -1,5 +1,12 @@
 import java.util.ArrayList;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.lang.reflect.*;
+
+import org.loopa.comm.message.IMessage;
+import org.loopa.comm.message.Message;
+import org.loopa.element.receiver.IReceiver;
+
 public class ObtainedData {
     private int configId;
     private int numDataItems;
@@ -46,14 +53,19 @@ public class ObtainedData {
   	}
 
     public IMessage toMessage(String from, String to){
-        String code = "001", type = "response";
+        String type = "response";
+        int code = 001;
         return new Message(to, from, code, type, getFieldsHashMap());
     }
 
     private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it
       HashMap hm = new HashMap();
-      for (Field field : this.getClass().getDeclaredFields()) {
-          hm.put(field.getName(), field.get(this).toString());
+      try {
+        for (Field field : this.getClass().getDeclaredFields()) {
+            hm.put(field.getName(), field.get(this).toString());
+        }
+      } catch (IllegalAccessException e) {
+          System.err.println("IllegalAccessException: " + e.getMessage());
       }
       return hm;
     }

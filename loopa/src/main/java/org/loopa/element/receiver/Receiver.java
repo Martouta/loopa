@@ -20,6 +20,7 @@ package org.loopa.element.receiver;
 
 import org.loopa.element.receiver.messageprocessor.IMessageProcessor;
 import org.loopa.generic.documents.managers.IPolicyManager;
+import org.loopa.comm.message.IMessage;
 
 public class Receiver extends AReceiver{
 
@@ -28,6 +29,6 @@ public class Receiver extends AReceiver{
 		// TODO Auto-generated constructor stub
 	}
 
-	public void doOperation(IMessage message) {}
+	public void doOperation(IMessage message) {} // TODO
 
 }

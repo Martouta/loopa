@@ -12,14 +12,14 @@ import java.util.Properties;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
-
 import java.sql.Timestamp;
-
 import org.json.JSONObject;
 import org.json.JSONArray;
-
 import java.lang.reflect.*;
 
+import org.loopa.comm.message.IMessage;
+import org.loopa.comm.message.Message;
+import org.loopa.element.receiver.IReceiver;
 
 public class KafkaService {
     private String kafkaUrl;
@@ -65,6 +65,8 @@ public class KafkaService {
 
     public void processRequest(IMessage m) {
       // TODO
+      // imprimir por pantalla
+      // acabara haciewndo request al readmessage
     }
 
     private void testConsumer(ConsumerConnector consumer, Class dataItemClass, IReceiver receiver) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -78,7 +80,7 @@ public class KafkaService {
             while (it.hasNext()) {
                 String kafkaMessage = new String(it.next().message());
                 ObtainedData obtainedData = getObtainedDataFromMessage(kafkaMessage, dataItemClass);
-                receiver.doOperation(obtainedData.toMessage("kafkaServiceTwitter", receiver.id()));
+                receiver.doOperation(obtainedData.toMessage("kafkaServiceTwitter", receiver.getComponentId()));
             }
         }
     }

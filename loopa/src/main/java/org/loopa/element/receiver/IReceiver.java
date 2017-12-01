@@ -20,6 +20,7 @@
 package org.loopa.element.receiver;
 
 import org.loopa.generic.element.component.ILoopAElementComponent;
+import org.loopa.comm.message.IMessage;
 
 public interface IReceiver extends ILoopAElementComponent{
   public void doOperation(IMessage message);
