@@ -99,10 +99,8 @@ hs_err_pid*
 .nfs*
 
 ### Gradle ###
-*/.gradle/
-*/*/.gradle/
-*/build/
-*/*/build/
+.gradle/
+build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
