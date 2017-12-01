@@ -1,6 +1,7 @@
 import java.util.ArrayList;
-import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Map;
+import java.sql.Timestamp;
 import java.lang.reflect.*;
 
 import org.loopa.comm.message.IMessage;
@@ -13,6 +14,11 @@ public class ObtainedData {
     private ArrayList<DataItem> dataItems;
     private int idOutput;
     private Timestamp searchTimeStamp;
+
+    /**
+  	* ObtainedData constructor
+  	*/
+  	public ObtainedData() { this.dataItems = new ArrayList(); }
 
     /**
   	* ObtainedData constructor
@@ -52,6 +58,10 @@ public class ObtainedData {
   		  return "ObtainedData [configId=" + configId + ", numDataItems=" + numDataItems + ", DataItems=" + dataItems.toString() + ", idOutput=" + idOutput + ", searchTimeStamp=" + searchTimeStamp + "]";
   	}
 
+    /**
+    * Create a Message from this ObtainedData's data in the body
+    * @return
+    */
     public IMessage toMessage(String from, String to){
         String type = "response";
         int code = 001;
@@ -59,14 +69,39 @@ public class ObtainedData {
     }
 
     private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it
-      HashMap hm = new HashMap();
+      HashMap<String, String> hmBodyMessage = new HashMap();
       try {
         for (Field field : this.getClass().getDeclaredFields()) {
-            hm.put(field.getName(), field.get(this).toString());
+            hmBodyMessage.put(field.getName(), field.get(this).toString());
         }
       } catch (IllegalAccessException e) {
           System.err.println("IllegalAccessException: " + e.getMessage());
       }
-      return hm;
+      return hmBodyMessage;
+    }
+
+    /**
+  	* Create a Obtained from a Message with its data
+  	* @return
+  	*/
+    public static ObtainedData fromMessage(IMessage message) {
+        Map<String, String> hmBodyMessage = message.getMessageBody();
+        ObtainedData od = new ObtainedData();
+
+        try {
+            for (Field field : ObtainedData.class.getDeclaredFields()) {
+                String value = hmBodyMessage.get(field.getName());
+                Method parseMethod = field.getType().getMethod("valueOf", String.class);
+                field.set(od, parseMethod.invoke(field, value));
+            }
+        } catch (IllegalAccessException e) {
+            System.err.println("IllegalAccessException: " + e.getMessage());
+        } catch (NoSuchMethodException e) {
+            System.err.println("NoSuchMethodException: " + e.getMessage());
+        } catch (InvocationTargetException e) {
+            System.err.println("InvocationTargetException: " + e.getMessage());
+        }
+
+        return od;
     }
 }

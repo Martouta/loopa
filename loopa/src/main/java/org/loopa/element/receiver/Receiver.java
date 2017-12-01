@@ -29,6 +29,8 @@ public class Receiver extends AReceiver{
 		// TODO Auto-generated constructor stub
 	}
 
-	public void doOperation(IMessage message) {} // TODO
+	public void doOperation(IMessage message) {
+		System.out.println( "TODO" );
+	}
 
 }
