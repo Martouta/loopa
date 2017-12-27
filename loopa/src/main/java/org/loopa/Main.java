@@ -134,7 +134,7 @@ public class Main {
                 }
               } else if (type == "setMonData") {
                 IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
-                r.doOperation(mResponsetMonData);
+                r.doOperation(mResponseMonData);
               }
         	}
         };
