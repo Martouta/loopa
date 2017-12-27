@@ -112,25 +112,30 @@ public class Main {
 
         	@Override
         	public void processLogicData(Map<String, String> monData) {
-              /** Receive mon data */
-      				System.out.println(monData);
+              int monFreq = Integer.parseInt( this.config.get("monFreq") );
+              String type = monData.get("type"), messageTo = config.get("1");
+              ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
+              Map<String, String> body = new HashMap<String, String>();
+              body.put("type", type);
 
-      				/** Example of requesting monitoring data (do idem for sending response Messages when required) */
-      				// ----Creat Message
-      				Map<String, String> body = new HashMap<String, String>();
+              System.out.println("processLogicData: " + monData);
 
-      				// At this point a pair with key "type" is mandatory for the MessageComposer to
-      				// operate correctly
-      				body.put("type", "getMonData");
+              if (type == "getMonData") {
+                IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
 
-      				IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), config.get("1"), 1,
-      						"request", body);
-      				// ----
-      				//Send Message
-      				ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients()
-      						.get(mRequestMonData.getMessageTo());
-      				r.doOperation(mRequestMonData);
-      				/***************************************/
+
+                while (true) {
+                  r.doOperation(mRequestMonData);
+                  try {
+                    Thread.sleep(monFreq);
+                  } catch(InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                  }
+                }
+              } else if (type == "setMonData") {
+                IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
+                r.doOperation(mResponsetMonData);
+              }
         	}
         };
         IFunctionalLogicEnactor flE = new MonitorFunctionalLogicEnactor(mm);
@@ -141,6 +146,7 @@ public class Main {
         HashMap hmpMessageComposer = new HashMap<String, String>();
         hmpMessageComposer.put("1", "senderTwitter");
         hmpMessageComposer.put("getMonData", "kafkaServiceTwitter");
+        hmpMessageComposer.put("setMonData", "kafkaServiceTwitter");
         IPolicy mcP = new Policy("messageComposerTwitter", hmpMessageComposer);
     		IPolicyManager mcPM = new PolicyManager(mcP);
     		IDataFormatter mcDF = new DataFormatter();
@@ -179,13 +185,14 @@ public class Main {
         IKnowledgeManager k = new KnowledgeManager("knowledgeManagerTwitter", kPM, kAKM);
 
         IMonitor monitor = new Monitor("MonitorPersistenceOperation", r, ls, fl, al, mc, s, k);
-        // TODO: monitor.getReceiver().doOperation();
+        monitor.addRecipient("kafkaServiceTwitter", kafkaService);
 
         // TODO: remove twitter simulator. for testing purposes
         TwitterMonitorSimulator.simulate();
 
-        // Run kafkaService reader and send messages to the receiver
-        monitor.addRecipient("kafkaServiceTwitter", kafkaService);
-        kafkaService.readMessages(monitor.getReceiver());
+        HashMap<String, String> hmBodyMessage = new HashMap();
+        hmBodyMessage.put("type", "getMonData");
+        IMessage m = new Message("Main", monitor.getReceiver().getComponentId(), 1, "request", hmBodyMessage);
+        monitor.getReceiver().doOperation(m);
     }
 }

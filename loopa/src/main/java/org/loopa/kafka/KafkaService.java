@@ -56,6 +56,7 @@ public class KafkaService {
     }
 
     public void processRequest(IMessage message) {
+        // TODO: Si es request, leer de kafka y enviarlo al monitor (al receiver de algun modo?) y si es response, escribir en otro kafka topic
         System.out.println("KafkaService#processRequest");
         System.out.println("body: " + message.getMessageBody());
         System.out.println("from: " + message.getMessageFrom());

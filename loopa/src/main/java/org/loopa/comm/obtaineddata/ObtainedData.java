@@ -72,6 +72,7 @@ public class ObtainedData {
 
     private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it
       HashMap<String, String> hmBodyMessage = new HashMap();
+      hmBodyMessage.put("type", "setMonData");
       try {
         for (Field field : this.getClass().getDeclaredFields()) {
             hmBodyMessage.put(field.getName(), field.get(this).toString());
