@@ -1,6 +1,7 @@
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.loopa.element.adaptationlogic.AdaptationLogic;
 import org.loopa.element.adaptationlogic.IAdaptationLogic;
@@ -62,7 +63,7 @@ public class Main {
             if (args.length > 2) { kafkaTopicWrite = args[2]; }
           }
         }
-        KafkaService kafkaService = new KafkaService(kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
+        KafkaService kafkaService = new KafkaService("kafkaServiceTwitter", kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
 
 
         // Receiver
@@ -89,7 +90,7 @@ public class Main {
         HashMap hmpFunctionalLogic = new HashMap<String, String>();
         hmpFunctionalLogic.put("1", "messageComposerTwitter");
         hmpFunctionalLogic.put("monFreq", "30");
-        IPolicy flP = new Policy("functionalLogicPolicy", hmpFunctionalLogic);
+        IPolicy flP = new Policy("functionalLogicTwitter", hmpFunctionalLogic);
         IPolicyManager flPM = new PolicyManager(flP);
         IMonitorManager mm = new IMonitorManager() {
           private Map<String, String> config = new HashMap<String, String>();
@@ -127,9 +128,9 @@ public class Main {
                 while (true) {
                   r.doOperation(mRequestMonData);
                   try {
-                    Thread.sleep(monFreq);
-                  } catch(InterruptedException ex) {
-                    Thread.currentThread().interrupt();
+                    TimeUnit.MILLISECONDS.sleep(monFreq);
+                  } catch (InterruptedException e) {
+                    System.err.println("InterruptedException: " + e.getMessage());
                   }
                 }
               } else if (type == "setMonData") {

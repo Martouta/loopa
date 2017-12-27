@@ -25,12 +25,14 @@ import org.loopa.element.receiver.IReceiver;
 import org.loopa.comm.obtaineddata.*;
 
 public class KafkaService {
+    private String ksID;
     private String kafkaUrl;
     private String kafkaTopicRead;
     private String kafkaTopicWrite;
     private Class classDataItemType;
 
-    public KafkaService(String url, String topicRead, String topicWrite, Class classDataItemType) {
+    public KafkaService(String id, String url, String topicRead, String topicWrite, Class classDataItemType) {
+        ksID = id;
         kafkaUrl = url;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
@@ -75,14 +77,10 @@ public class KafkaService {
         producer.close();
     }
 
-    public void readMessages(IReceiver receiver) {
+    public void readLastMessage(IReceiver receiver) {
         Properties properties = createConsumerProperties();
         ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(properties));
-        testConsumer(consumer, receiver);
-        if (consumer != null) { consumer.shutdown(); }
-    }
 
-    private void testConsumer(ConsumerConnector consumer, IReceiver receiver) {
         Map<String, Integer> topicCount = new HashMap<>();
         topicCount.put(kafkaTopicRead, 1);
 
@@ -93,9 +91,11 @@ public class KafkaService {
             while (it.hasNext()) {
                 String kafkaMessage = new String(it.next().message());
                 ObtainedData obtainedData = getObtainedDataFromMessage(kafkaMessage);
-                receiver.doOperation(obtainedData.toMessage("kafkaServiceTwitter", receiver.getComponentId()));
+                receiver.doOperation(obtainedData.toMessage(ksID, receiver.getComponentId()));
             }
         }
+
+        if (consumer != null) { consumer.shutdown(); }
     }
 
     private ObtainedData getObtainedDataFromMessage(String message) {

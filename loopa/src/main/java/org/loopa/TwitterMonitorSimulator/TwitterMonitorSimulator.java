@@ -21,8 +21,8 @@ public class TwitterMonitorSimulator {
         String kafkaUrl = DEFAULT_KAFKA_URL; //(args.length > 0) ? args[0] : DEFAULT_KAFKA_URL;
         TwitterMonitorSimulator kafkaProducer = new TwitterMonitorSimulator(kafkaUrl);
 
-        int timeSlot = 5;
-        int secondsRunning = timeSlot;
+        int timeSlot = 30;
+        double secondsRunning = timeSlot * 0.001;
 
         try {
           while (!kafkaProducer.isFinishTime(secondsRunning)) {
@@ -30,8 +30,9 @@ public class TwitterMonitorSimulator {
               String msg = TweetsGenerator.getRandomTweets();
               KeyedMessage<Integer, String> data = new KeyedMessage<>(topic, msg);
               producer.send(data);
-              TimeUnit.SECONDS.sleep(timeSlot);
-              secondsRunning += timeSlot;
+              //TimeUnit.SECONDS.sleep(timeSlot);
+              TimeUnit.MILLISECONDS.sleep(timeSlot);
+              secondsRunning += (timeSlot * 0.001);
           }
         } catch (InterruptedException e) {
           System.err.println("InterruptedException: " + e.getMessage());
@@ -40,8 +41,8 @@ public class TwitterMonitorSimulator {
         producer.close();
     }
 
-    private boolean isFinishTime(int secondsRunning){
-        double maxMinutes = 0.5;
+    private boolean isFinishTime(double secondsRunning){
+        double maxMinutes = 2 / 60;
         return (secondsRunning > maxMinutes*60);
     }
 }
