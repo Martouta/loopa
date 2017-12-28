@@ -189,8 +189,7 @@ public class Main {
         KafkaService kafkaService = new KafkaService("kafkaServiceTwitter", monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient("kafkaServiceTwitter", kafkaService);
 
-        // TODO: remove twitter simulator. for testing purposes
-        TwitterMonitorSimulator.simulate();
+        TwitterMonitorSimulator.simulate(kafkaUrl, kafkaTopicRead);
 
         HashMap<String, String> hmBodyMessage = new HashMap();
         hmBodyMessage.put("type", "getMonData");
