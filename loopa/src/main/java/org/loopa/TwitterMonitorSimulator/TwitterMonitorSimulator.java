@@ -21,28 +21,31 @@ public class TwitterMonitorSimulator {
         String kafkaUrl = DEFAULT_KAFKA_URL; //(args.length > 0) ? args[0] : DEFAULT_KAFKA_URL;
         TwitterMonitorSimulator kafkaProducer = new TwitterMonitorSimulator(kafkaUrl);
 
-        int timeSlot = 30;
-        double secondsRunning = timeSlot * 0.001;
+        final String topic = "twitter";
+        final int maxMessages = 5, timeSlot = 30;
 
-        try {
-          while (!kafkaProducer.isFinishTime(secondsRunning)) {
-              String topic = "twitter";
-              String msg = TweetsGenerator.getRandomTweets();
-              KeyedMessage<Integer, String> data = new KeyedMessage<>(topic, msg);
-              producer.send(data);
-              //TimeUnit.SECONDS.sleep(timeSlot);
-              TimeUnit.MILLISECONDS.sleep(timeSlot);
-              secondsRunning += (timeSlot * 0.001);
+        Thread threadAll = new Thread("ThreadSimulateTwitterAllMessages") {
+          public void run(){
+            int numMessages = 0;
+            while (numMessages < maxMessages) {
+                Thread threadOne = new Thread("ThreadSimulateTwitterOneMessage") {
+                  public void run(){
+                    String msg = TweetsGenerator.getRandomTweets();
+                    KeyedMessage<Integer, String> data = new KeyedMessage<>(topic, msg);
+                    producer.send(data);
+                  }
+                };
+                threadOne.start();
+                numMessages++;
+                try {
+                  TimeUnit.MILLISECONDS.sleep(timeSlot);
+                } catch (InterruptedException e) {
+                  System.err.println("InterruptedException: " + e.getMessage());
+                }
+            }
+            producer.close();
           }
-        } catch (InterruptedException e) {
-          System.err.println("InterruptedException: " + e.getMessage());
-        }
-
-        producer.close();
-    }
-
-    private boolean isFinishTime(double secondsRunning){
-        double maxMinutes = 2 / 60;
-        return (secondsRunning > maxMinutes*60);
+        };
+        threadAll.start();
     }
 }
