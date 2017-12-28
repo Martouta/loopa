@@ -7,9 +7,10 @@ import kafka.producer.ProducerConfig;
 
 public class TwitterMonitorSimulator {
     private static Producer<Integer, String> producer;
-    private final Properties properties = new Properties();
+    private Properties properties;
 
     public TwitterMonitorSimulator(String kafkaUrl) {
+        properties = new Properties();
         properties.put("metadata.broker.list", kafkaUrl+":9092");
         properties.put("serializer.class", "kafka.serializer.StringEncoder");
         properties.put("request.required.acks", "1");
