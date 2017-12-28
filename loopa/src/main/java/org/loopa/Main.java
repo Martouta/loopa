@@ -63,7 +63,6 @@ public class Main {
             if (args.length > 2) { kafkaTopicWrite = args[2]; }
           }
         }
-        KafkaService kafkaService = new KafkaService("kafkaServiceTwitter", kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
 
 
         // Receiver
@@ -126,6 +125,7 @@ public class Main {
 
 
                 while (true) {
+                  // TODO: supongo que acabare haciendolo con threads
                   r.doOperation(mRequestMonData);
                   try {
                     TimeUnit.MILLISECONDS.sleep(monFreq);
@@ -186,6 +186,7 @@ public class Main {
         IKnowledgeManager k = new KnowledgeManager("knowledgeManagerTwitter", kPM, kAKM);
 
         IMonitor monitor = new Monitor("MonitorPersistenceOperation", r, ls, fl, al, mc, s, k);
+        KafkaService kafkaService = new KafkaService("kafkaServiceTwitter", monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient("kafkaServiceTwitter", kafkaService);
 
         // TODO: remove twitter simulator. for testing purposes

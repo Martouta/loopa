@@ -22,7 +22,7 @@ public class TwitterMonitorSimulator {
         TwitterMonitorSimulator kafkaProducer = new TwitterMonitorSimulator(kafkaUrl);
 
         final String topic = "twitter";
-        final int maxMessages = 5, timeSlot = 30;
+        final int maxMessages = 10, timeSlot = 30;
 
         Thread threadAll = new Thread("ThreadSimulateTwitterAllMessages") {
           public void run(){
