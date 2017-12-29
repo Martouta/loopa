@@ -9,7 +9,6 @@ import kafka.producer.ProducerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.common.TopicPartition;
 
 import java.util.stream.Collectors;
 
@@ -36,6 +35,7 @@ public class KafkaService {
     private String kafkaTopicWrite;
     private Class classDataItemType;
     private IMonitor monitor;
+    private KafkaConsumer<String, String> consumer;
 
     public KafkaService(String id, IMonitor monitor, String url, String topicRead, String topicWrite, Class classDataItemType) {
         ksID = id;
@@ -44,31 +44,24 @@ public class KafkaService {
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
         this.classDataItemType = classDataItemType;
+        createConsumer();
+    }
+
+    private void createConsumer() {
+        this.consumer = new KafkaConsumer<>(createConsumerProperties());
+        consumer.subscribe(Arrays.asList(this.kafkaTopicRead));
+        consumer.poll(0); // INFO: subscribe() and assign() are lazy -- thus, you also need to do a "dummy call" to poll() before you can use seek()
     }
 
     private Properties createConsumerProperties() {
         Properties properties = new Properties();
         properties.put("group.id", "twitterGroup"); // TODO dynamic?
 
-        // properties.put("zookeeper.connect", kafkaUrl+":2181");
-        // properties.put("zookeeper.session.timeout.ms", "500");
-        // properties.put("zookeeper.sync.time.ms", "250");
-        // properties.put("auto.commit.interval.ms", "1000");
-
         properties.put("bootstrap.servers", kafkaUrl+":9092");
-        //properties.put("auto.offset.reset", "latest"); // TODO testing so far
         properties.put("enable.auto.commit", "false");
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         // properties.put("session.timeout.ms", "30000"); TODO ???
-
-        // properties.put("bootstrap.servers", kafkaUrl+":9092");
-        // properties.put("auto.offset.reset", "latest"); // TODO testing so far
-        // properties.put("enable.auto.commit", "true");
-        // properties.put("auto.commit.interval.ms", "1000");
-        // properties.put("session.timeout.ms", "30000");
-        // properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        // properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
         return properties;
     }
@@ -106,47 +99,12 @@ public class KafkaService {
 
     public void readLastMessage(IReceiver receiver) {
         System.out.println("Llega a KafkaService#readLastMessage");
-        Properties properties = createConsumerProperties();
 
-        // ConsumerConnector consumer = Consumer.createJavaConsumerConnector(new ConsumerConfig(properties));
-        // Map<String, Integer> topicCount = new HashMap<>();
-        // topicCount.put(kafkaTopicRead, 1);
-        // Map<String, List<KafkaStream<byte[], byte[]>>> consumerStreams = consumer.createMessageStreams(topicCount);
-        // List<KafkaStream<byte[], byte[]>> streams = consumerStreams.get(kafkaTopicRead);
-        // for (final KafkaStream stream : streams) {
-        //     ConsumerIterator<byte[], byte[]> it = stream.iterator();
-        //     while (it.hasNext()) {
-        //         String kafkaMessage = new String(it.next().message());
-        //         ObtainedData obtainedData = getObtainedDataFromMessage(kafkaMessage);
-        //         System.out.println(obtainedData.toString()); // TODO
-        //         // receiver.doOperation(obtainedData.toMessage(ksID, receiver.getComponentId()));
-        //     }
-        // }
-        // if (consumer != null) { consumer.shutdown(); }
-
-
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
-        consumer.subscribe(Arrays.asList(kafkaTopicRead));
-        List<TopicPartition> partitions = consumer.partitionsFor(kafkaTopicRead).stream().map(part->{TopicPartition tp = new TopicPartition(part.topic(),part.partition()); return tp;}).collect(Collectors.toList());
-            consumer.poll(0); // INFO: subscribe() and assign() are lazy -- thus, you also need to do a "dummy call" to poll() before you can use seek()
-        // TopicPartition topicPartition = partitions.get(0); //new TopicPartition(kafkaTopicRead, 0);
-        //consumer.seek(partitions.get(0), -1);
-            consumer.seekToEnd(partitions);
-        //consumer.seek(partitions.get(0), (consumer.position(partitions.get(0)) - 1L));
         ConsumerRecords<String, String> records = consumer.poll(100);
         for (ConsumerRecord<String, String> record : records) {
           System.out.println(record.toString()); // TODO
         }
         consumer.commitSync();
-
-
-        // KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
-        // consumer.subscribe(Arrays.asList(kafkaTopicRead));
-        // ConsumerRecords<String, String> records = consumer.poll(100);
-        // for (ConsumerRecord<String, String> record : records) {
-        //   System.out.println(record.toString()); // TODO
-        // }
-
 
         System.out.println("------------------------------------");
     }
