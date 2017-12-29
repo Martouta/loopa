@@ -56,12 +56,14 @@ public class KafkaService {
         // properties.put("auto.commit.interval.ms", "1000");
 
         properties.put("bootstrap.servers", kafkaUrl+":9092");
-        properties.put("auto.offset.reset", "latest"); // TODO testing so far
+        //properties.put("auto.offset.reset", "latest"); // TODO testing so far
         properties.put("enable.auto.commit", "false");
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        // properties.put("session.timeout.ms", "30000"); TODO ???
 
         // properties.put("bootstrap.servers", kafkaUrl+":9092");
+        // properties.put("auto.offset.reset", "latest"); // TODO testing so far
         // properties.put("enable.auto.commit", "true");
         // properties.put("auto.commit.interval.ms", "1000");
         // properties.put("session.timeout.ms", "30000");
@@ -126,10 +128,10 @@ public class KafkaService {
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         consumer.subscribe(Arrays.asList(kafkaTopicRead));
         List<TopicPartition> partitions = consumer.partitionsFor(kafkaTopicRead).stream().map(part->{TopicPartition tp = new TopicPartition(part.topic(),part.partition()); return tp;}).collect(Collectors.toList());
-        //    consumer.poll(0); // INFO: subscribe() and assign() are lazy -- thus, you also need to do a "dummy call" to poll() before you can use seek()
+            consumer.poll(0); // INFO: subscribe() and assign() are lazy -- thus, you also need to do a "dummy call" to poll() before you can use seek()
         // TopicPartition topicPartition = partitions.get(0); //new TopicPartition(kafkaTopicRead, 0);
         //consumer.seek(partitions.get(0), -1);
-        //    consumer.seekToEnd(partitions);
+            consumer.seekToEnd(partitions);
         //consumer.seek(partitions.get(0), (consumer.position(partitions.get(0)) - 1L));
         ConsumerRecords<String, String> records = consumer.poll(100);
         for (ConsumerRecord<String, String> record : records) {
