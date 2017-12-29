@@ -124,13 +124,16 @@ public class Main {
                 IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
 
 
+                long startMs = System.currentTimeMillis();
                 while (true) {
-                  long startMs = System.currentTimeMillis();
                   r.doOperation(mRequestMonData);
                   long endMs = System.currentTimeMillis();
                   try {
                     int waitTime = monFreq - ((int) (endMs - startMs));
-                    if (waitTime > 0) { TimeUnit.MILLISECONDS.sleep(waitTime); }
+                    if (waitTime > 0) {
+                      TimeUnit.MILLISECONDS.sleep(waitTime);
+                      startMs += monFreq;
+                    }
                   } catch (InterruptedException e) {
                     System.err.println("InterruptedException: " + e.getMessage());
                   }
