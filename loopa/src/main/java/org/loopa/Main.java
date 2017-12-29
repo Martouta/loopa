@@ -125,10 +125,12 @@ public class Main {
 
 
                 while (true) {
-                  // TODO: supongo que acabare haciendolo con threads
+                  long startMs = System.currentTimeMillis();
                   r.doOperation(mRequestMonData);
+                  long endMs = System.currentTimeMillis();
                   try {
-                    TimeUnit.MILLISECONDS.sleep(monFreq);
+                    int waitTime = monFreq - ((int) (endMs - startMs));
+                    if (waitTime > 0) { TimeUnit.MILLISECONDS.sleep(monFreq); }
                   } catch (InterruptedException e) {
                     System.err.println("InterruptedException: " + e.getMessage());
                   }
