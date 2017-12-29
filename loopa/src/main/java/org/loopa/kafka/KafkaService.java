@@ -55,13 +55,13 @@ public class KafkaService {
 
     private Properties createConsumerProperties() {
         Properties properties = new Properties();
-        properties.put("group.id", "twitterGroup"); // TODO dynamic?
+        String groupID = this.classDataItemType.getSimpleName().replaceAll("DataItem","");
+        properties.put("group.id", groupID);
 
         properties.put("bootstrap.servers", kafkaUrl+":9092");
         properties.put("enable.auto.commit", "false");
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        // properties.put("session.timeout.ms", "30000"); TODO ???
 
         return properties;
     }
