@@ -130,7 +130,7 @@ public class Main {
                   long endMs = System.currentTimeMillis();
                   try {
                     int waitTime = monFreq - ((int) (endMs - startMs));
-                    if (waitTime > 0) { TimeUnit.MILLISECONDS.sleep(monFreq); }
+                    if (waitTime > 0) { TimeUnit.MILLISECONDS.sleep(waitTime); }
                   } catch (InterruptedException e) {
                     System.err.println("InterruptedException: " + e.getMessage());
                   }
