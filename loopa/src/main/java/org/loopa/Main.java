@@ -120,7 +120,7 @@ public class Main {
               System.out.println("processLogicData: " + monData);
 
               if (type == "getMonData") {
-                body.put("type", type); // TODO: hace falta?
+                body.put("type", type);
                 IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
 
 
