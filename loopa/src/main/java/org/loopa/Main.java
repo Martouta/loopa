@@ -140,6 +140,7 @@ public class Main {
                 }
               } else if (type == "setMonData") {
                 body.putAll(monData);
+                body.put("type", "receivedMonData");
                 IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
                 r.doOperation(mResponseMonData);
               }
@@ -153,7 +154,7 @@ public class Main {
         HashMap hmpMessageComposer = new HashMap<String, String>();
         hmpMessageComposer.put("1", "senderTwitter");
         hmpMessageComposer.put("getMonData", "kafkaServiceTwitter");
-        hmpMessageComposer.put("setMonData", "kafkaServiceTwitter");
+        hmpMessageComposer.put("receivedMonData", "kafkaServiceTwitter");
         IPolicy mcP = new Policy("messageComposerTwitter", hmpMessageComposer);
     		IPolicyManager mcPM = new PolicyManager(mcP);
     		IDataFormatter mcDF = new DataFormatter();
