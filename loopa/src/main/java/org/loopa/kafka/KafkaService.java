@@ -85,13 +85,18 @@ public class KafkaService {
         // TODO switch case
         String type = message.getMessageType();
         if (type == "request") { readLastMessage(monitor.getReceiver()); }
-        else if (type == "response") { System.out.println("TODO response"); }
+        else if (type == "response") { writeMessage(buildResponseKafkaMessage(message.getMessageBody())); }
+    }
+
+    private String buildResponseKafkaMessage(Map<String, String> messageBody){
+      messageBody.remove("type");
+      return "\"SocialNetworksMonitoredData\": {" + messageBody.toString() + "}";
     }
 
     public void writeMessage(String msg) {
         Properties properties = createProducerProperties();
         Producer<Integer, String> producer = new Producer<>(new ProducerConfig(properties));
-        KeyedMessage<Integer, String> data = new KeyedMessage<>(kafkaTopicRead, msg);
+        KeyedMessage<Integer, String> data = new KeyedMessage<>(kafkaTopicWrite, msg);
         producer.send(data);
         producer.close();
     }
@@ -114,7 +119,7 @@ public class KafkaService {
     private ObtainedData getObtainedDataFromKafkaRecord(ConsumerRecord<String, String> record) {
       String message = new String(record.value());
       JSONObject jsonDataObject  = new JSONObject(message); // json with all data
-      JSONObject twitterData = jsonDataObject.getJSONObject("SocialNetworksMonitoredData"); // get SocialNetworksMonitoredData object (twitterCase)
+      JSONObject twitterData = jsonDataObject.getJSONObject("SocialNetworksMonitoredData");
       int configId = twitterData.getInt("confId");
       int numDataItems = twitterData.getInt("numDataItems");
       int idOutput = twitterData.getInt("idOutput");
