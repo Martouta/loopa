@@ -74,23 +74,22 @@ public class KafkaService {
     }
 
     public void processRequest(IMessage message) {
-        // TODO: Si es request, leer de kafka y enviarlo al monitor (al receiver de algun modo?) y si es response, escribir en otro kafka topic
-        System.out.println("KafkaService#processRequest");
-        System.out.println("body: " + message.getMessageBody());
-        System.out.println("from: " + message.getMessageFrom());
-        System.out.println("to: " + message.getMessageTo());
-        System.out.println("type: " + message.getMessageType());
-        System.out.println("code: " + message.getMessageCode());
-        System.out.println( ObtainedData.fromMessage(message) );
-        // TODO switch case
         String type = message.getMessageType();
-        if (type == "request") { readLastMessage(monitor.getReceiver()); }
-        else if (type == "response") { writeMessage(buildResponseKafkaMessage(message.getMessageBody())); }
+        switch (type) {
+    		case "request":
+    			readLastMessage(monitor.getReceiver());
+    			break;
+    		case "response":
+    			writeMessage(buildResponseKafkaMessage(message.getMessageBody()));
+    			break;
+    		default:
+    			System.err.println("Invalid type code in processRequest");
+    		}
     }
 
     private String buildResponseKafkaMessage(Map<String, String> messageBody){
       messageBody.remove("type");
-      return "\"SocialNetworksMonitoredData\": {" + messageBody.toString() + "}";
+      return messageBody.toString();
     }
 
     public void writeMessage(String msg) {
@@ -102,18 +101,14 @@ public class KafkaService {
     }
 
     public void readLastMessage(IReceiver receiver) {
-        System.out.println("Llega a KafkaService#readLastMessage");
-
         ConsumerRecords<String, String> records = consumer.poll(100);
         if (!records.isEmpty()) {
           List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
           ConsumerRecord<String, String> lastRecord = listRecords.get(listRecords.size() - 1);
           ObtainedData obtainedData = getObtainedDataFromKafkaRecord(lastRecord);
-          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId()));
+          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId(), "response", 1));
         }
         consumer.commitSync();
-
-        System.out.println("------------------------------------");
     }
 
     private ObtainedData getObtainedDataFromKafkaRecord(ConsumerRecord<String, String> record) {

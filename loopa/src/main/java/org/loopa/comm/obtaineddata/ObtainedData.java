@@ -64,10 +64,8 @@ public class ObtainedData {
     * Create a Message from this ObtainedData's data in the body
     * @return
     */
-    public IMessage toMessage(String from, String to){
-        String type = "response";
-        int code = 1;
-        return new Message(from, to, code, type, getFieldsHashMap());
+    public IMessage toMessage(String from, String to, String type, int code){
+      return new Message(from, to, code, type, getFieldsHashMap());
     }
 
     private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it

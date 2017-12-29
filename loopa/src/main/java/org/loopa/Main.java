@@ -117,12 +117,17 @@ public class Main {
               ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
               Map<String, String> body = new HashMap<String, String>();
 
-              System.out.println("processLogicData: " + monData);
-
-              if (type == "getMonData") {
+              switch (type) {
+              case "setMonData":
+                body.put("idOutput", monData.get("idOutput"));
+                body.put("searchTimeStamp", monData.get("searchTimeStamp"));
+                body.put("type", "receivedMonData");
+                IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
+                r.doOperation(mResponseMonData);
+                break;
+              case "getMonData":
                 body.put("type", type);
                 IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
-
 
                 long startMs = System.currentTimeMillis();
                 while (true) {
@@ -138,11 +143,9 @@ public class Main {
                     System.err.println("InterruptedException: " + e.getMessage());
                   }
                 }
-              } else if (type == "setMonData") {
-                body.putAll(monData);
-                body.put("type", "receivedMonData");
-                IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
-                r.doOperation(mResponseMonData);
+                // No need to break because it is a while true
+              default:
+                System.err.println("Invalid type code in processLogicData");
               }
         	}
         };
