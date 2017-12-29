@@ -4,11 +4,10 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
-// import kafka.consumer.*;
-// import kafka.javaapi.consumer.ConsumerConnector;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.common.TopicPartition;
 
 import java.util.stream.Collectors;
 
@@ -101,15 +100,19 @@ public class KafkaService {
         System.out.println("Llega a KafkaService#readLastMessage");
 
         ConsumerRecords<String, String> records = consumer.poll(100);
-        for (ConsumerRecord<String, String> record : records) {
-          System.out.println(record.toString()); // TODO
+        if (!records.isEmpty()) {
+          List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
+          ConsumerRecord<String, String> lastRecord = listRecords.get(listRecords.size() - 1);
+          ObtainedData obtainedData = getObtainedDataFromKafkaRecord(lastRecord);
+          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId()));
         }
         consumer.commitSync();
 
         System.out.println("------------------------------------");
     }
 
-    private ObtainedData getObtainedDataFromMessage(String message) {
+    private ObtainedData getObtainedDataFromKafkaRecord(ConsumerRecord<String, String> record) {
+      String message = new String(record.value());
       JSONObject jsonDataObject  = new JSONObject(message); // json with all data
       JSONObject twitterData = jsonDataObject.getJSONObject("SocialNetworksMonitoredData"); // get SocialNetworksMonitoredData object (twitterCase)
       int configId = twitterData.getInt("confId");

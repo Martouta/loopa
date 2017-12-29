@@ -116,11 +116,11 @@ public class Main {
               String type = monData.get("type"), messageTo = config.get("1");
               ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
               Map<String, String> body = new HashMap<String, String>();
-              body.put("type", type);
 
               System.out.println("processLogicData: " + monData);
 
               if (type == "getMonData") {
+                body.put("type", type); // TODO: hace falta?
                 IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
 
 
@@ -134,6 +134,7 @@ public class Main {
                   }
                 }
               } else if (type == "setMonData") {
+                body.putAll(monData);
                 IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
                 r.doOperation(mResponseMonData);
               }
