@@ -49,7 +49,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     if (lastTime != null) {
       Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
       System.out.println("Los instants --> " + lastTime + " y " + currentTime); // TODO for testing purposes
-      if (timeElapsed == monFreq) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
+      if (timeElapsed <= monFreq+1 && timeElapsed >= monFreq-1) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
       else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
     }
     lastTime = currentTime;

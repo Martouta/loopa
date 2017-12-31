@@ -37,8 +37,8 @@ public class TwitterMonitorSimulator {
                   Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).toMillis();
                   if (waitTime > 0) {
                     TimeUnit.MILLISECONDS.sleep(waitTime);
-                    startTime = Instant.now();
                   }
+                  startTime = Instant.now();
                 } catch (InterruptedException e) {
                   System.err.println("InterruptedException: " + e.getMessage());
                 }

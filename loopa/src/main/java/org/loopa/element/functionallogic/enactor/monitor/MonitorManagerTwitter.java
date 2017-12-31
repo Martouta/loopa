@@ -46,8 +46,8 @@ public class MonitorManagerTwitter implements IMonitorManager {
         Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).toMillis();
         if (waitTime > 0) {
           TimeUnit.MILLISECONDS.sleep(waitTime);
-          startTime = Instant.now();
         }
+        startTime = Instant.now();
       } catch (InterruptedException e) {
         System.err.println("InterruptedException: " + e.getMessage());
       }
