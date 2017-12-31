@@ -65,7 +65,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
         doReceivedMonData(messageTo, monData);
         break;
       default:
-        System.err.println("Invalid type code in processLogicData");
+        System.err.println("Invalid type code " + type + " in processLogicData");
       }
   }
 }

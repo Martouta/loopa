@@ -74,7 +74,7 @@ public class MonitorManagerTwitter implements IMonitorManager {
         doGetMonData(messageTo);
         // No need to break because it contains an infinite loop: while true
       default:
-        System.err.println("Invalid type code in processLogicData");
+        System.err.println("Invalid type code " + type + " in processLogicData");
       }
   }
 }
