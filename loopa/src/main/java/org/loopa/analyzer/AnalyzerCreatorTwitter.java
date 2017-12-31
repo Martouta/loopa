@@ -1,4 +1,4 @@
-package org.loopa.monitor;
+package org.loopa.analyzer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +10,9 @@ import org.loopa.element.adaptationlogic.enactor.IAdaptationLogicEnactor;
 import org.loopa.element.functionallogic.FunctionalLogic;
 import org.loopa.element.functionallogic.IFunctionalLogic;
 import org.loopa.element.functionallogic.enactor.IFunctionalLogicEnactor;
-import org.loopa.element.functionallogic.enactor.monitor.IMonitorManager;
-import org.loopa.element.functionallogic.enactor.monitor.MonitorManagerTwitter;
-import org.loopa.element.functionallogic.enactor.monitor.MonitorFunctionalLogicEnactor;
+import org.loopa.element.functionallogic.enactor.analyzer.IAnalyzerManager;
+import org.loopa.element.functionallogic.enactor.analyzer.AnalyzerManagerTwitter;
+import org.loopa.element.functionallogic.enactor.analyzer.AnalyzerFunctionalLogicEnactor;
 import org.loopa.element.knowledgemanager.IKnowledgeManager;
 import org.loopa.element.knowledgemanager.KnowledgeManager;
 import org.loopa.element.knowledgemanager.adaptiveknowledgemanager.AdaptiveKnowledgeManager;
@@ -40,27 +40,21 @@ import org.loopa.generic.documents.Policy;
 import org.loopa.generic.documents.managers.IPolicyManager;
 import org.loopa.generic.documents.managers.PolicyManager;
 import org.loopa.generic.element.component.ILoopAElementComponent;
-import org.loopa.monitor.IMonitor;
-import org.loopa.monitor.Monitor;
+import org.loopa.analyzer.IAnalyzer;
+import org.loopa.analyzer.Analyzer;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 import org.loopa.kafka.KafkaService;
 
-public class MonitorTwitterCreator {
-  public static IMonitor create(String monitorID, int monFreq) {
-    return new Monitor(monitorID, createReceiver(), createLogicSelector(), createFunctionalLogic(monFreq), createAdaptationLogic(), createMessageComposer(), createSender(), createKnowledgeManager());
+public class AnalyzerCreatorTwitter {
+  public static IAnalyzer create(String analyzerID) {
+    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID),
+                      createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID), createKnowledgeManager(analyzerID));
 	}
 
-  public static void startMonitoring(IMonitor monitor){
-    HashMap<String, String> hmBodyMessage = new HashMap();
-    hmBodyMessage.put("type", "getMonData");
-    IMessage m = new Message("Main", monitor.getReceiver().getComponentId(), 1, "request", hmBodyMessage);
-    monitor.getReceiver().doOperation(m);
-  }
-
-  private static IReceiver createReceiver(){
+  private static IReceiver createReceiver(String analyzerID){
     HashMap hmpReceiver = new HashMap<String, String>();
-    hmpReceiver.put("1", "logicSelectorTwitter");
+    hmpReceiver.put("1", "logicSelector" + analyzerID);
     IPolicy rP = new Policy("receiverTwitter", hmpReceiver);
     IPolicyManager rPM = new PolicyManager(rP);
     IMessageProcessor rMP = new MessageProcessor();
@@ -68,9 +62,9 @@ public class MonitorTwitterCreator {
     return new Receiver("receiverTwitter", rPM, rMP);
   }
 
-  private static ILogicSelector createLogicSelector(){
+  private static ILogicSelector createLogicSelector(String analyzerID){
     HashMap hmpLogicSelector = new HashMap<String, String>();
-    hmpLogicSelector.put("1", "functionalLogicTwitter");
+    hmpLogicSelector.put("1", "functionalLogic" + analyzerID);
     IPolicy lsP = new Policy("logicSelectorTwitter", hmpLogicSelector);
     IPolicyManager lsPM = new PolicyManager(lsP);
     ILogicMessageDispatcher lsMD = new LogicMessageDispatcher();
@@ -78,23 +72,22 @@ public class MonitorTwitterCreator {
     return new LogicSelector("logicSelectorTwitter", lsPM, lsMD);
   }
 
-  private static IFunctionalLogic createFunctionalLogic(int monFreq) {
+  private static IFunctionalLogic createFunctionalLogic(String analyzerID) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
-    hmpFunctionalLogic.put("1", "messageComposerTwitter");
-    hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq));
+    hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
     IPolicy flP = new Policy("functionalLogicTwitter", hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
-    IMonitorManager mm = new MonitorManagerTwitter();
+    IAnalyzerManager mm = new AnalyzerManagerTwitter();
     IFunctionalLogicEnactor flE = new MonitorFunctionalLogicEnactor(mm);
     flP.addListerner(flE);
     return new FunctionalLogic("functionalLogicTwitter", flPM, flE);
   }
 
-  private static IMessageComposer createMessageComposer() {
+  private static IMessageComposer createMessageComposer(String analyzerID) {
     HashMap hmpMessageComposer = new HashMap<String, String>();
-    hmpMessageComposer.put("1", "senderTwitter");
-    hmpMessageComposer.put("getMonData", "kafkaServiceTwitter");
-    hmpMessageComposer.put("receivedMonData", "kafkaServiceTwitter");
+    hmpMessageComposer.put("1", "sender" + analyzerID);
+    hmpMessageComposer.put("getMonData", "kafkaService" + analyzerID);
+    hmpMessageComposer.put("receivedMonData", "kafkaService" + analyzerID);
     IPolicy mcP = new Policy("messageComposerTwitter", hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
@@ -104,9 +97,9 @@ public class MonitorTwitterCreator {
     return new MessageComposer("messageComposerTwitter", mcPM, mcDF, mcMC);
   }
 
-  private static ISender createSender() {
+  private static ISender createSender(String analyzerID) {
     HashMap hmpSender = new HashMap<String, String>();
-    hmpSender.put("1", "kafkaServiceTwitter");
+    hmpSender.put("1", "kafkaService" + analyzerID);
     IPolicy sP = new Policy("senderTwitter", hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
     IMessageSender sMS = new MessageSender() {
@@ -120,7 +113,7 @@ public class MonitorTwitterCreator {
     return new Sender("senderTwitter", sPM, sMS);
   }
 
-  private static IAdaptationLogic createAdaptationLogic() { // (empty)
+  private static IAdaptationLogic createAdaptationLogic(String analyzerID) { // (empty)
     IPolicy alP = new Policy("adaptationLogicTwitter", new HashMap<String, String>());
     IPolicyManager alPM = new PolicyManager(alP);
     IAdaptationLogicEnactor alE = new AdaptationLogicEnactor();
@@ -128,7 +121,7 @@ public class MonitorTwitterCreator {
     return new AdaptationLogic("adaptationLogicTwitter", alPM, alE);
   }
 
-  private static IKnowledgeManager createKnowledgeManager() { // (empty)
+  private static IKnowledgeManager createKnowledgeManager(String analyzerID) { // (empty)
     IPolicy kP = new Policy("knowledgeManagerTwitter", new HashMap<String, String>());
     IPolicyManager kPM = new PolicyManager(kP);
     IAdaptiveKnowledgeManager kAKM = new AdaptiveKnowledgeManager();

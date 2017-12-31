@@ -1,7 +1,9 @@
 import org.loopa.comm.obtaineddata.DataItemTwitter;
 import org.loopa.kafka.KafkaService;
-import org.loopa.monitor.MonitorTwitterCreator;
+import org.loopa.monitor.MonitorCreatorTwitter;
 import org.loopa.monitor.IMonitor;
+import org.loopa.monitor.AnalyzerCreatorTwitter;
+import org.loopa.monitor.IAnalyzer;
 
 public class Main {
     private final static String DEFAULT_KAFKA_URL = "147.83.192.53";
@@ -20,14 +22,18 @@ public class Main {
           }
         }
 
-        int monFreq = 30;
+        // TODO: don't forget about the 'lambda' ?
 
-        IMonitor monitor = MonitorTwitterCreator.create("MonitorPersistenceOperation", monFreq);
-        KafkaService kafkaService = new KafkaService("kafkaServiceTwitter", monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
-        monitor.addRecipient("kafkaServiceTwitter", kafkaService);
+        int monFreq = 30;
+        String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;
+
+        IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);
+        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID);
+        KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
+        monitor.addRecipient(kafkaServiceID, kafkaService);
 
         TwitterMonitorSimulator.simulate(kafkaUrl, kafkaTopicRead);
-        
-        MonitorTwitterCreator.startMonitoring(monitor);
+
+        MonitorCreatorTwitter.startMonitoring(monitor);
     }
 }
