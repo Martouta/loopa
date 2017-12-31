@@ -2,8 +2,8 @@ import org.loopa.comm.obtaineddata.DataItemTwitter;
 import org.loopa.kafka.KafkaService;
 import org.loopa.monitor.MonitorCreatorTwitter;
 import org.loopa.monitor.IMonitor;
-import org.loopa.monitor.AnalyzerCreatorTwitter;
-import org.loopa.monitor.IAnalyzer;
+import org.loopa.analyzer.AnalyzerCreatorTwitter;
+import org.loopa.analyzer.IAnalyzer;
 
 public class Main {
     private final static String DEFAULT_KAFKA_URL = "147.83.192.53";
