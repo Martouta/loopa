@@ -55,7 +55,7 @@ public class AnalyzerCreatorTwitter {
   private static IReceiver createReceiver(String analyzerID){
     HashMap hmpReceiver = new HashMap<String, String>();
     hmpReceiver.put("1", "logicSelector" + analyzerID);
-    IPolicy rP = new Policy("receiver" + analyzerID, hmpReceiver);
+    IPolicy rP = new Policy("receiverPolicy" + analyzerID, hmpReceiver);
     IPolicyManager rPM = new PolicyManager(rP);
     IMessageProcessor rMP = new MessageProcessor();
     rP.addListerner(rMP);
@@ -65,7 +65,7 @@ public class AnalyzerCreatorTwitter {
   private static ILogicSelector createLogicSelector(String analyzerID){
     HashMap hmpLogicSelector = new HashMap<String, String>();
     hmpLogicSelector.put("1", "functionalLogic" + analyzerID);
-    IPolicy lsP = new Policy("logicSelector" + analyzerID, hmpLogicSelector);
+    IPolicy lsP = new Policy("logicSelectorPolicy" + analyzerID, hmpLogicSelector);
     IPolicyManager lsPM = new PolicyManager(lsP);
     ILogicMessageDispatcher lsMD = new LogicMessageDispatcher();
     lsP.addListerner(lsMD);
@@ -75,7 +75,7 @@ public class AnalyzerCreatorTwitter {
   private static IFunctionalLogic createFunctionalLogic(String analyzerID) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
     hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
-    IPolicy flP = new Policy("functionalLogic" + analyzerID, hmpFunctionalLogic);
+    IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
     IAnalyzerManager mm = new AnalyzerManagerTwitter();
     IFunctionalLogicEnactor flE = new MonitorFunctionalLogicEnactor(mm);
@@ -88,7 +88,7 @@ public class AnalyzerCreatorTwitter {
     hmpMessageComposer.put("1", "sender" + analyzerID);
     hmpMessageComposer.put("getMonData", "kafkaService" + analyzerID);
     hmpMessageComposer.put("receivedMonData", "kafkaService" + analyzerID);
-    IPolicy mcP = new Policy("messageComposer" + analyzerID, hmpMessageComposer);
+    IPolicy mcP = new Policy("messageComposerPolicy" + analyzerID, hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
     IMessageCreator mcMC = new MessageCreator();
@@ -100,7 +100,7 @@ public class AnalyzerCreatorTwitter {
   private static ISender createSender(String analyzerID) {
     HashMap hmpSender = new HashMap<String, String>();
     hmpSender.put("1", "kafkaService" + analyzerID);
-    IPolicy sP = new Policy("sender" + analyzerID, hmpSender);
+    IPolicy sP = new Policy("senderPolicy" + analyzerID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
     IMessageSender sMS = new MessageSender() {
       @Override
@@ -114,7 +114,7 @@ public class AnalyzerCreatorTwitter {
   }
 
   private static IAdaptationLogic createAdaptationLogic(String analyzerID) { // (empty)
-    IPolicy alP = new Policy("adaptationLogic" + analyzerID, new HashMap<String, String>());
+    IPolicy alP = new Policy("adaptationLogicPolicy" + analyzerID, new HashMap<String, String>());
     IPolicyManager alPM = new PolicyManager(alP);
     IAdaptationLogicEnactor alE = new AdaptationLogicEnactor();
     alP.addListerner(alE);
@@ -122,7 +122,7 @@ public class AnalyzerCreatorTwitter {
   }
 
   private static IKnowledgeManager createKnowledgeManager(String analyzerID) { // (empty)
-    IPolicy kP = new Policy("knowledgeManager" + analyzerID, new HashMap<String, String>());
+    IPolicy kP = new Policy("knowledgeManagerPolicy" + analyzerID, new HashMap<String, String>());
     IPolicyManager kPM = new PolicyManager(kP);
     IAdaptiveKnowledgeManager kAKM = new AdaptiveKnowledgeManager();
     kP.addListerner(kAKM);
