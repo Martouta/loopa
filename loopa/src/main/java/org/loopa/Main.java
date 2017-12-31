@@ -28,7 +28,7 @@ public class Main {
         String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;
 
         IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);
-        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID);
+        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, monFreq);
         KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient(kafkaServiceID, kafkaService);
 

@@ -47,8 +47,8 @@ import org.loopa.comm.message.Message;
 import org.loopa.kafka.KafkaService;
 
 public class AnalyzerCreatorTwitter {
-  public static IAnalyzer create(String analyzerID) {
-    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID),
+  public static IAnalyzer create(String analyzerID, int monFreq) {
+    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, monFreq),
                       createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID), createKnowledgeManager(analyzerID));
 	}
 
@@ -72,13 +72,13 @@ public class AnalyzerCreatorTwitter {
     return new LogicSelector("logicSelector" + analyzerID, lsPM, lsMD);
   }
 
-  private static IFunctionalLogic createFunctionalLogic(String analyzerID) {
+  private static IFunctionalLogic createFunctionalLogic(String analyzerID, int monFreq) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
     hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
-    // hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq)); // TODO
+    hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq));
     IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
-    IAnalyzerManager am = new AnalyzerManagerTwitter(); // TODO
+    IAnalyzerManager am = new AnalyzerManagerTwitter();
     IFunctionalLogicEnactor flE = new AnalyzerFunctionalLogicEnactor(am);
     flP.addListerner(flE);
     return new FunctionalLogic("functionalLogic" + analyzerID, flPM, flE);
