@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import java.lang.reflect.*;
 
 import org.loopa.monitor.IMonitor;
+import org.loopa.analyzer.IAnalyzer;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 import org.loopa.element.receiver.IReceiver;
@@ -34,11 +35,13 @@ public class KafkaService {
     private String kafkaTopicWrite;
     private Class classDataItemType;
     private IMonitor monitor;
+    private IAnalyzer analyzer;
     private KafkaConsumer<String, String> consumer;
 
-    public KafkaService(String id, IMonitor monitor, String url, String topicRead, String topicWrite, Class classDataItemType) {
+    public KafkaService(String id, IMonitor monitor, IAnalyzer analyzer, String url, String topicRead, String topicWrite, Class classDataItemType) {
         ksID = id;
         this.monitor = monitor;
+        this.analyzer = analyzer;
         kafkaUrl = url;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
@@ -80,11 +83,16 @@ public class KafkaService {
     			readLastMessage(monitor.getReceiver());
     			break;
     		case "response":
-    			writeMessage(buildResponseKafkaMessage(message.getMessageBody()));
+          sendToAnalyzer(message, analyzer.getReceiver());
     			break;
     		default:
     			System.err.println("Invalid type code in processRequest");
     		}
+    }
+
+    private void sendToAnalyzer(IMessage monitorMessage, IReceiver receiver) {
+      IMessage analyzerMessage = new Message(this.ksID, receiver.getComponentId(), 1, "request", monitorMessage.getMessageBody());
+      receiver.doOperation(analyzerMessage);
     }
 
     private String buildResponseKafkaMessage(Map<String, String> messageBody){
@@ -92,7 +100,7 @@ public class KafkaService {
       return messageBody.toString();
     }
 
-    public void writeMessage(String msg) {
+    private void writeMessage(String msg) {
         Properties properties = createProducerProperties();
         Producer<Integer, String> producer = new Producer<>(new ProducerConfig(properties));
         KeyedMessage<Integer, String> data = new KeyedMessage<>(kafkaTopicWrite, msg);
@@ -100,13 +108,13 @@ public class KafkaService {
         producer.close();
     }
 
-    public void readLastMessage(IReceiver receiver) {
+    private void readLastMessage(IReceiver receiver) {
         ConsumerRecords<String, String> records = consumer.poll(100);
         if (!records.isEmpty()) {
           List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
           ConsumerRecord<String, String> lastRecord = listRecords.get(listRecords.size() - 1);
           ObtainedData obtainedData = getObtainedDataFromKafkaRecord(lastRecord);
-          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId(), "response", 1));
+          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId(), 1, "response"));
         }
         consumer.commitSync();
     }

@@ -29,7 +29,7 @@ public class Main {
 
         IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);
         IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, monFreq);
-        KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
+        KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, analyzer, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient(kafkaServiceID, kafkaService);
 
         TwitterMonitorSimulator.simulate(kafkaUrl, kafkaTopicRead);

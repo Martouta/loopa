@@ -64,7 +64,7 @@ public class ObtainedData {
     * Create a Message from this ObtainedData's data in the body
     * @return
     */
-    public IMessage toMessage(String from, String to, String type, int code){
+    public IMessage toMessage(String from, String to, int code, String type){
       return new Message(from, to, code, type, getFieldsHashMap());
     }
 
