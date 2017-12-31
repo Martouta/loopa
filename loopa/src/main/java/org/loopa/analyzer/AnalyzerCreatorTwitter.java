@@ -75,10 +75,11 @@ public class AnalyzerCreatorTwitter {
   private static IFunctionalLogic createFunctionalLogic(String analyzerID) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
     hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
+    // hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq)); // TODO
     IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
-    IAnalyzerManager mm = new AnalyzerManagerTwitter();
-    IFunctionalLogicEnactor flE = new MonitorFunctionalLogicEnactor(mm);
+    IAnalyzerManager am = new AnalyzerManagerTwitter(); // TODO
+    IFunctionalLogicEnactor flE = new AnalyzerFunctionalLogicEnactor(am);
     flP.addListerner(flE);
     return new FunctionalLogic("functionalLogic" + analyzerID, flPM, flE);
   }
@@ -86,8 +87,9 @@ public class AnalyzerCreatorTwitter {
   private static IMessageComposer createMessageComposer(String analyzerID) {
     HashMap hmpMessageComposer = new HashMap<String, String>();
     hmpMessageComposer.put("1", "sender" + analyzerID);
-    hmpMessageComposer.put("getMonData", "kafkaService" + analyzerID);
-    hmpMessageComposer.put("receivedMonData", "kafkaService" + analyzerID);
+    // hmpMessageComposer.put("getMonData", "kafkaService" + analyzerID);
+    // hmpMessageComposer.put("receivedMonData", "kafkaService" + analyzerID);
+    // TODO
     IPolicy mcP = new Policy("messageComposerPolicy" + analyzerID, hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
@@ -99,14 +101,15 @@ public class AnalyzerCreatorTwitter {
 
   private static ISender createSender(String analyzerID) {
     HashMap hmpSender = new HashMap<String, String>();
-    hmpSender.put("1", "kafkaService" + analyzerID);
+    // hmpSender.put("1", "kafkaService" + analyzerID); // TODO
     IPolicy sP = new Policy("senderPolicy" + analyzerID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
     IMessageSender sMS = new MessageSender() {
       @Override
       protected void sendMessage(IMessage message) {
-        KafkaService ks = (KafkaService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
-        ks.processRequest(message);
+        // KafkaService ks = (KafkaService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
+        // ks.processRequest(message);
+        // TODO
       }
     };
     sP.addListerner(sMS);
