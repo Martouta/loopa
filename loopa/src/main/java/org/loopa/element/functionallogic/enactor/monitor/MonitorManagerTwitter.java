@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.loopa.element.functionallogic.enactor.monitor.IMonitorManager;
 import org.loopa.generic.element.component.ILoopAElementComponent;
@@ -36,15 +38,15 @@ public class MonitorManagerTwitter implements IMonitorManager {
     IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
     int monFreq = Integer.parseInt( this.config.get("monFreq") );
 
-    long startMs = System.currentTimeMillis();
+    Instant startTime = Instant.now();
     while (true) {
       r.doOperation(mRequestMonData);
-      long endMs = System.currentTimeMillis();
+      Instant endTime = Instant.now();
       try {
-        int waitTime = monFreq - ((int) (endMs - startMs));
+        Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).toMillis();
         if (waitTime > 0) {
           TimeUnit.MILLISECONDS.sleep(waitTime);
-          startMs += monFreq;
+          startTime = Instant.now();
         }
       } catch (InterruptedException e) {
         System.err.println("InterruptedException: " + e.getMessage());

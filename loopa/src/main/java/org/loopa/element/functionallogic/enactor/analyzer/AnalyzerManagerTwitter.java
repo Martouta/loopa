@@ -20,7 +20,6 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
 
   @Override
   public void setConfiguration(Map<String, String> config) {
-    System.out.println("AnalyzerManagerTwitter#setConfiguration " + config);
     this.config = config;
   }
 

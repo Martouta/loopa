@@ -1,5 +1,7 @@
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.time.Duration;
+import java.time.Instant;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -24,13 +26,19 @@ public class TwitterMonitorSimulator {
         Thread threadAll = new Thread("ThreadSimulateTwitterAllMessages") {
           public void run(){
             int numMessages = 0;
+            Instant startTime = Instant.now();
             while (numMessages < maxMessages) {
                 String msg = TweetsGenerator.getRandomTweets();
                 KeyedMessage<Integer, String> data = new KeyedMessage<>(topic, msg);
                 producer.send(data);
                 numMessages++;
                 try {
-                  TimeUnit.MILLISECONDS.sleep(timeSlot);
+                  Instant endTime = Instant.now();
+                  Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).toMillis();
+                  if (waitTime > 0) {
+                    TimeUnit.MILLISECONDS.sleep(waitTime);
+                    startTime = Instant.now();
+                  }
                 } catch (InterruptedException e) {
                   System.err.println("InterruptedException: " + e.getMessage());
                 }
