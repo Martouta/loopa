@@ -16,17 +16,17 @@ public class MonitorManagerTwitter implements IMonitorManager {
 
   @Override
   public void setConfiguration(Map<String, String> config) {
-        this.config = config;
+    this.config = config;
   }
 
   @Override
   public void setComponent(ILoopAElementComponent c) {
-        this.component = c;
+    this.component = c;
   }
 
   @Override
   public ILoopAElementComponent getComponent() {
-        return this.component;
+    return this.component;
   }
 
   private void doGetMonData(String messageTo) {

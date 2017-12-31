@@ -20,17 +20,18 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
 
   @Override
   public void setConfiguration(Map<String, String> config) {
-        this.config = config;
+    System.out.println("AnalyzerManagerTwitter#setConfiguration " + config);
+    this.config = config;
   }
 
   @Override
   public void setComponent(ILoopAElementComponent c) {
-        this.component = c;
+    this.component = c;
   }
 
   @Override
   public ILoopAElementComponent getComponent() {
-        return this.component;
+    return this.component;
   }
 
   private void doReceivedMonData(String messageTo, Map<String, String> monData) {
@@ -48,6 +49,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     Instant currentTime = Timestamp.valueOf( monData.get("searchTimeStamp") ).toInstant();
     if (lastTime != null) {
       Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
+      System.out.println("Los instants --> " + lastTime + ' y ' + currentTime); // TODO for testing purposes
       if (timeElapsed == monFreq) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
       else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
     }
