@@ -22,14 +22,14 @@ public class Main {
           }
         }
 
-        // TODO: don't forget about the 'lambda' ?
         // TODO: error management
+        // TODO: mas flexible?
 
-        int monFreq = 30;
+        int monFreq = 30, maxFreq = 32, maxFreqChangeRate = 3, iterations = 2;
         String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;
 
         IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);
-        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, monFreq);
+        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, maxFreq, maxFreqChangeRate, iterations);
         KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, analyzer, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient(kafkaServiceID, kafkaService);
 

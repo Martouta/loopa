@@ -47,8 +47,8 @@ import org.loopa.comm.message.Message;
 import org.loopa.kafka.KafkaService;
 
 public class AnalyzerCreatorTwitter {
-  public static IAnalyzer create(String analyzerID, int monFreq) {
-    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, monFreq),
+  public static IAnalyzer create(String analyzerID, int maxFreq, int maxFreqChangeRate, int iterations) {
+    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations),
                       createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID), createKnowledgeManager(analyzerID));
 	}
 
@@ -72,10 +72,12 @@ public class AnalyzerCreatorTwitter {
     return new LogicSelector("logicSelector" + analyzerID, lsPM, lsMD);
   }
 
-  private static IFunctionalLogic createFunctionalLogic(String analyzerID, int monFreq) {
+  private static IFunctionalLogic createFunctionalLogic(String analyzerID, int maxFreq, int maxFreqChangeRate, int iterations) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
     hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
-    hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq));
+    hmpFunctionalLogic.put("maxFreq", Integer.toString(maxFreq));
+    hmpFunctionalLogic.put("maxFreqChangeRate", Integer.toString(maxFreqChangeRate));
+    hmpFunctionalLogic.put("iterations", Integer.toString(iterations));
     IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
     IAnalyzerManager am = new AnalyzerManagerTwitter();
@@ -87,9 +89,6 @@ public class AnalyzerCreatorTwitter {
   private static IMessageComposer createMessageComposer(String analyzerID) {
     HashMap hmpMessageComposer = new HashMap<String, String>();
     hmpMessageComposer.put("1", "sender" + analyzerID);
-    // hmpMessageComposer.put("getMonData", "kafkaService" + analyzerID);
-    // hmpMessageComposer.put("receivedMonData", "kafkaService" + analyzerID);
-    // TODO
     IPolicy mcP = new Policy("messageComposerPolicy" + analyzerID, hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
@@ -110,6 +109,7 @@ public class AnalyzerCreatorTwitter {
         // KafkaService ks = (KafkaService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
         // ks.processRequest(message);
         // TODO
+        System.out.println("En Analyzer->Sender->sendMessage. TODO implementarlo :)");
       }
     };
     sP.addListerner(sMS);

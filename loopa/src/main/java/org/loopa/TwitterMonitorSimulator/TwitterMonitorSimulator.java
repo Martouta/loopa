@@ -46,6 +46,9 @@ public class TwitterMonitorSimulator {
             producer.close();
           }
         };
+
+        producer.send( new KeyedMessage<>(topic + "another", "") ); // Dummy access
+
         threadAll.start();
     }
 }
