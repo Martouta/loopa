@@ -3,6 +3,7 @@ package org.loopa.element.functionallogic.enactor.analyzer;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -34,6 +35,16 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     return this.component;
   }
 
+  private void isWorkingProperly(int monFreq, Instant currentTime) {
+    if (lastTime != null) {
+      Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
+      System.out.println("Los instants --> " + lastTime + " y " + currentTime); // TODO for testing purposes
+      if (timeElapsed <= monFreq+1 && timeElapsed >= monFreq-1) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
+      else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
+    }
+    lastTime = currentTime;
+  }
+
   private void doReceivedMonData(String messageTo, Map<String, String> monData) {
     // Map<String, String> body = new HashMap<String, String>();
     // body.put("idOutput", monData.get("idOutput"));
@@ -46,18 +57,14 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     // TODO: determinar si el twitterMonitor esta yendo bien o no
     //    y si no mandar una reconfiguraciona traves de kafka utilizando la topic y formato que exite para ello
 
-    System.out.println("Lo que me llega: " + monData.get("searchTimeStamp"));
-    System.out.println("Lo que convierto: " + ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp"));
-
-    // int monFreq = Integer.parseInt( this.config.get("monFreq") );
-    // Instant currentTime = Timestamp.valueOf( monData.get("searchTimeStamp") ).toInstant();
-    // if (lastTime != null) {
-    //   Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
-    //   System.out.println("Los instants --> " + lastTime + " y " + currentTime); // TODO for testing purposes
-    //   if (timeElapsed <= monFreq+1 && timeElapsed >= monFreq-1) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
-    //   else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
-    // }
-    // lastTime = currentTime;
+    int monFreq = Integer.parseInt( this.config.get("monFreq") );
+    ArrayList<Object> arrayObjectTimestamps = ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp");
+    System.out.println("Lo que convierto: " + arrayObjectTimestamps);
+    for (Object objTimestamp : arrayObjectTimestamps) {
+      Instant currentTime = ((Timestamp) objTimestamp).toInstant();
+      isWorkingProperly(monFreq, currentTime);
+    }
+    System.out.println("------------------------");
   }
 
   @Override
