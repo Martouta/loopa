@@ -16,7 +16,7 @@ public class ObtainedData {
     private ArrayList<DataItem> dataItems;
     private int idOutput;
     private Timestamp searchTimeStamp;
-    private static String splitPattern = "|";
+    private static String splitRegexPattern = ";";
 
     /**
   	* ObtainedData constructor
@@ -67,11 +67,9 @@ public class ObtainedData {
     }
 
     public static ArrayList<Object> getValuesFromFieldnameInHashMap(Map<String, String> monData, String fieldKey) {
-      String[] arrayStr = monData.get(fieldKey).split(splitPattern);
+      String[] arrayStr = monData.get(fieldKey).split(splitRegexPattern);
       ArrayList<Object> arrayRealType = new ArrayList();
-      System.out.println("getValuesFromFieldnameInHashMap arrayStr: " + arrayStr);
       for (String strValue : arrayStr) {
-        System.out.println("getValuesFromFieldnameInHashMap strValue: " + strValue);
         try {
           arrayRealType.add(convertValueFromStringToRealType(ObtainedData.class.getDeclaredField(fieldKey), strValue));
         } catch (NoSuchFieldException e) {
@@ -90,7 +88,7 @@ public class ObtainedData {
         try {
           for (Field field : ObtainedData.class.getDeclaredFields()) {
               String fieldKey = field.getName(), newValue = field.get(obtainedData).toString();
-              hmBodyMessage.put(fieldKey, hmBodyMessage.get(fieldKey) + splitPattern + newValue);
+              hmBodyMessage.put(fieldKey, hmBodyMessage.get(fieldKey) + splitRegexPattern + newValue);
           }
         } catch (IllegalAccessException e) {
             System.err.println("IllegalAccessException: " + e.getMessage());
@@ -147,9 +145,6 @@ public class ObtainedData {
             System.err.println("NoSuchMethodException: " + e.getMessage());
         } catch (InvocationTargetException e) {
             System.err.println("InvocationTargetException: " + e.getMessage());
-            System.err.println("STRVALUE: " + strValue);
-            e.printStackTrace();
-            System.exit(0);
         }
         return convertedValue;
     }
