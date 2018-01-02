@@ -116,7 +116,7 @@ public class KafkaService {
           ArrayList<ObtainedData> arrayObtainedDatas = new ArrayList();
           int totalRecords = listRecords.size();
           for (int i = 0; i < totalRecords; i++) {
-            ConsumerRecord<String, String> currentRecord = listRecords.get(listRecords.size() - 1);
+            ConsumerRecord<String, String> currentRecord = listRecords.get(i);
             arrayObtainedDatas.add( getObtainedDataFromKafkaRecord(currentRecord) );
           }
           receiver.doOperation(ObtainedData.toMessage(arrayObtainedDatas, this.ksID, receiver.getComponentId(), 1, "response"));
