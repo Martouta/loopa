@@ -81,9 +81,17 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
       System.out.println("isWorkingProperly: " + workingProperly + " - " + counterWrongIterations);
       System.out.println("maxFreq: " + maxFreq + " , maxFreqChangeRate: " + maxFreqChangeRate + " , iterations: " + iterations);
       System.out.println("[Despues] currentMinFreq: " + currentMinFreq + " y currentMaxFreq: " + currentMaxFreq);
-      System.out.println("------------------------");
+      System.out.println("---Fin de mensaje en AnalyzerManagerTwitter#doReceivedMonData");
+      if (counterWrongIterations == iterations) {
+        System.out.println("Llega al IF");
+        counterWrongIterations = 0;
+        Map<String, String> body = new HashMap<String, String>();
+        body.put("type", "failedMonData");
+        ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
+        IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
+        r.doOperation(mResponseMonData);
+      }
     }
-    // TODO: falta el escenario si falla
   }
 
   @Override

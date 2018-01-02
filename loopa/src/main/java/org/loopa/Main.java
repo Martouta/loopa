@@ -25,7 +25,7 @@ public class Main {
         // TODO: error management
         // TODO: mas flexible?
 
-        int monFreq = 30, maxFreq = 32, maxFreqChangeRate = 3, iterations = 2;
+        int monFreq = 30, maxFreq = 20, maxFreqChangeRate = 3, iterations = 2;
         String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;
 
         IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);

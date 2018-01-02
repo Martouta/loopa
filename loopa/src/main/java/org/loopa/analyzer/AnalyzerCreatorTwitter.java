@@ -89,6 +89,7 @@ public class AnalyzerCreatorTwitter {
   private static IMessageComposer createMessageComposer(String analyzerID) {
     HashMap hmpMessageComposer = new HashMap<String, String>();
     hmpMessageComposer.put("1", "sender" + analyzerID);
+    hmpMessageComposer.put("failedMonData", "sender" + analyzerID);
     IPolicy mcP = new Policy("messageComposerPolicy" + analyzerID, hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
