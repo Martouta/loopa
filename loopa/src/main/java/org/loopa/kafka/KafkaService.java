@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.sql.Timestamp;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -80,7 +81,7 @@ public class KafkaService {
         String type = message.getMessageType();
         switch (type) {
     		case "request":
-    			readLastMessage(monitor.getReceiver());
+    			readLastMessages(monitor.getReceiver());
     			break;
     		case "response":
           sendToAnalyzer(message, analyzer.getReceiver());
@@ -108,13 +109,17 @@ public class KafkaService {
         producer.close();
     }
 
-    private void readLastMessage(IReceiver receiver) {
+    private void readLastMessages(IReceiver receiver) {
         ConsumerRecords<String, String> records = consumer.poll(100);
         if (!records.isEmpty()) {
           List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
-          ConsumerRecord<String, String> lastRecord = listRecords.get(listRecords.size() - 1);
-          ObtainedData obtainedData = getObtainedDataFromKafkaRecord(lastRecord);
-          receiver.doOperation(obtainedData.toMessage(this.ksID, receiver.getComponentId(), 1, "response"));
+          ArrayList<ObtainedData> arrayObtainedDatas = new ArrayList();
+          int totalRecords = listRecords.size();
+          for (int i = 0; i < totalRecords; i++) {
+            ConsumerRecord<String, String> currentRecord = listRecords.get(listRecords.size() - 1);
+            arrayObtainedDatas.add( getObtainedDataFromKafkaRecord(currentRecord) );
+          }
+          receiver.doOperation(ObtainedData.toMessage(arrayObtainedDatas, this.ksID, receiver.getComponentId(), 1, "response"));
         }
         consumer.commitSync();
     }

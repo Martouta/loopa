@@ -21,7 +21,7 @@ public class TwitterMonitorSimulator {
 
     public static void simulate(String kafkaUrl, String topic) {
         TwitterMonitorSimulator kafkaProducer = new TwitterMonitorSimulator(kafkaUrl);
-        final int maxMessages = 5, timeSlot = 30;
+        final int maxMessages = 5*3, timeSlot = 10;
 
         Thread threadAll = new Thread("ThreadSimulateTwitterAllMessages") {
           public void run(){

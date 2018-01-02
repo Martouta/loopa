@@ -44,9 +44,6 @@ public class ObtainedData {
     		this.searchTimeStamp = searchTimeStamp;
   	}
 
-    /**
-  	* Add a new DataItem to the list
-  	*/
     public void addDataItem(DataItem dataItem) {
         dataItems.add(dataItem);
     }
@@ -60,12 +57,43 @@ public class ObtainedData {
   		  return "ObtainedData [configId=" + configId + ", numDataItems=" + numDataItems + ", DataItems=" + dataItems.toString() + ", idOutput=" + idOutput + ", searchTimeStamp=" + searchTimeStamp + "]";
   	}
 
-    /**
-    * Create a Message from this ObtainedData's data in the body
-    * @return
-    */
     public IMessage toMessage(String from, String to, int code, String type){
       return new Message(from, to, code, type, getFieldsHashMap());
+    }
+
+    public static IMessage toMessage(ArrayList<ObtainedData> arrayObtainedData, String from, String to, int code, String type) {
+      return new Message(from, to, code, type, ObtainedData.getFieldsHashMap(arrayObtainedData));
+    }
+
+    public static ArrayList<Object> getValuesFromFieldnameInHashMap(Map<String, String> monData, String fieldKey) {
+      String[] arrayStr = monData.get(fieldKey).split("|");
+      ArrayList<Object> arrayRealType = new ArrayList();
+      for (String strValue : arrayStr) {
+        try {
+          arrayRealType.add(convertValueFromStringToRealType(ObtainedData.class.getField(fieldKey), strValue));
+        } catch (NoSuchFieldException e) {
+          System.err.println("NoSuchFieldException: " + e.getMessage());
+        }
+      }
+      return arrayRealType;
+    }
+
+    private static HashMap<String, String> getFieldsHashMap(ArrayList<ObtainedData> arrayObtainedData) { // so far it does it without the attributes of the tweet itself because we don't use it
+      HashMap<String, String> hmBodyMessage = arrayObtainedData.get(0).getFieldsHashMap(); // initialized with the first obtainedData
+      hmBodyMessage.put("type", "setMonData");
+      int totalRecords = arrayObtainedData.size();
+      for (int indexOD = 1; indexOD < totalRecords; indexOD++) { // Iterates the rest of ObtainedDatas of the array if there are more
+        ObtainedData obtainedData = arrayObtainedData.get(indexOD);
+        try {
+          for (Field field : ObtainedData.class.getDeclaredFields()) {
+              String fieldKey = field.getName(), newValue = field.get(obtainedData).toString();
+              hmBodyMessage.put(fieldKey, hmBodyMessage.get(fieldKey) + "|" + newValue);
+          }
+        } catch (IllegalAccessException e) {
+            System.err.println("IllegalAccessException: " + e.getMessage());
+        }
+      }
+      return hmBodyMessage;
     }
 
     private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it
@@ -81,18 +109,34 @@ public class ObtainedData {
       return hmBodyMessage;
     }
 
-    /**
-  	* Create a Obtained from a Message with its data
-  	* @return
-  	*/
     public static ObtainedData fromMessage(IMessage message) { // so far it does it without the attributes of the tweet itself because we don't use it
         Map<String, String> hmBodyMessage = message.getMessageBody();
         ObtainedData od = new ObtainedData();
 
+        for (Field field : ObtainedData.class.getDeclaredFields()) {
+            String value = hmBodyMessage.get(field.getName());
+            if (value != null) { setValueToField(od, field, value); }
+        }
+
+        return od;
+    }
+
+    private static void setValueToField(ObtainedData od, Field field, String value) { // so far it does it without the attributes of the tweet itself because we don't use it
         try {
-            for (Field field : ObtainedData.class.getDeclaredFields()) {
-                String value = hmBodyMessage.get(field.getName());
-                if (value != null) { setValueToField(od, field, value); }
+          field.set(od, convertValueFromStringToRealType(field, value));
+        } catch (IllegalAccessException e) {
+          System.err.println("IllegalAccessException: " + e.getMessage());
+        }
+    }
+
+    private static Object convertValueFromStringToRealType(Field field, String strValue) { // so far it does it without the attributes of the tweet itself because we don't use it
+        Object convertedValue = null;
+        try {
+            if (int.class.equals(field.getType())) {
+                convertedValue = Integer.parseInt(strValue);
+            } else if(field.getName() != "dataItems") {
+                Method parseMethod = field.getType().getMethod("valueOf", String.class);
+                convertedValue = parseMethod.invoke(field, strValue);
             }
         } catch (IllegalAccessException e) {
             System.err.println("IllegalAccessException: " + e.getMessage());
@@ -101,16 +145,6 @@ public class ObtainedData {
         } catch (InvocationTargetException e) {
             System.err.println("InvocationTargetException: " + e.getMessage());
         }
-
-        return od;
-    }
-
-    private static void setValueToField(ObtainedData od, Field field, String value) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException { // so far it does it without the attributes of the tweet itself because we don't use it
-        if (int.class.equals(field.getType())) {
-            field.set(od, Integer.parseInt(value));
-        } else if(field.getName() != "dataItems") {
-            Method parseMethod = field.getType().getMethod("valueOf", String.class);
-            field.set(od, parseMethod.invoke(field, value));
-        }
+        return convertedValue;
     }
 }

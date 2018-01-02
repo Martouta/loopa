@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.loopa.comm.obtaineddata.ObtainedData;
 import org.loopa.element.functionallogic.enactor.analyzer.IAnalyzerManager;
 import org.loopa.generic.element.component.ILoopAElementComponent;
 import org.loopa.comm.message.IMessage;
@@ -44,15 +45,18 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
 
     // TODO: determinar si el twitterMonitor esta yendo bien o no
     //    y si no mandar una reconfiguraciona traves de kafka utilizando la topic y formato que exite para ello
-    int monFreq = Integer.parseInt( this.config.get("monFreq") );
-    Instant currentTime = Timestamp.valueOf( monData.get("searchTimeStamp") ).toInstant();
-    if (lastTime != null) {
-      Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
-      System.out.println("Los instants --> " + lastTime + " y " + currentTime); // TODO for testing purposes
-      if (timeElapsed <= monFreq+1 && timeElapsed >= monFreq-1) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
-      else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
-    }
-    lastTime = currentTime;
+
+    System.out.println("Lo que me llega: " + ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp"));
+
+    // int monFreq = Integer.parseInt( this.config.get("monFreq") );
+    // Instant currentTime = Timestamp.valueOf( monData.get("searchTimeStamp") ).toInstant();
+    // if (lastTime != null) {
+    //   Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
+    //   System.out.println("Los instants --> " + lastTime + " y " + currentTime); // TODO for testing purposes
+    //   if (timeElapsed <= monFreq+1 && timeElapsed >= monFreq-1) { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData todo correcto"); }
+    //   else { System.out.println("TODO AnalyzerManagerTwitter#doReceivedMonData no tiene el tiempo correcto. real: " + timeElapsed + " monFreq: " + monFreq); }
+    // }
+    // lastTime = currentTime;
   }
 
   @Override
