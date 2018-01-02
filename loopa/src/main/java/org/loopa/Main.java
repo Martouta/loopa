@@ -23,6 +23,7 @@ public class Main {
         }
 
         // TODO: don't forget about the 'lambda' ?
+        // TODO: error management
 
         int monFreq = 30;
         String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;

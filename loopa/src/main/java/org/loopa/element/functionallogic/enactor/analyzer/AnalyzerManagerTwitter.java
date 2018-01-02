@@ -46,7 +46,8 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     // TODO: determinar si el twitterMonitor esta yendo bien o no
     //    y si no mandar una reconfiguraciona traves de kafka utilizando la topic y formato que exite para ello
 
-    System.out.println("Lo que me llega: " + ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp"));
+    System.out.println("Lo que me llega: " + monData.get("searchTimeStamp"));
+    System.out.println("Lo que convierto: " + ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp"));
 
     // int monFreq = Integer.parseInt( this.config.get("monFreq") );
     // Instant currentTime = Timestamp.valueOf( monData.get("searchTimeStamp") ).toInstant();
