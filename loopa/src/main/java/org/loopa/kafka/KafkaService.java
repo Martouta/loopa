@@ -53,7 +53,6 @@ public class KafkaService {
     private void createConsumer() {
         this.consumer = new KafkaConsumer<>(createConsumerProperties());
         consumer.subscribe(Arrays.asList(this.kafkaTopicRead));
-        consumer.poll(0); // INFO: subscribe() and assign() are lazy -- thus, you also need to do a "dummy call" to poll() before you can use seek()
     }
 
     private Properties createConsumerProperties() {
@@ -110,7 +109,7 @@ public class KafkaService {
     }
 
     private void readLastMessages(IReceiver receiver) {
-        ConsumerRecords<String, String> records = consumer.poll(100);
+        ConsumerRecords<String, String> records = consumer.poll(0);
         if (!records.isEmpty()) {
           List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
           ArrayList<ObtainedData> arrayObtainedDatas = new ArrayList();
