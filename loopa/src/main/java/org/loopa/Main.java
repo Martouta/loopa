@@ -33,8 +33,6 @@ public class Main {
         KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, analyzer, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
         monitor.addRecipient(kafkaServiceID, kafkaService);
 
-        TwitterMonitorSimulator.simulate(kafkaUrl, kafkaTopicRead);
-
         MonitorCreatorTwitter.startMonitoring(monitor);
     }
 }
