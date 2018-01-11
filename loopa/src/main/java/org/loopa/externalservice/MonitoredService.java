@@ -56,11 +56,7 @@ public class MonitoredService extends ExternalService {
 
   private void reconfigureMonitor(int newTimeSlot) {
     this.timeSlot = newTimeSlot;
-<<<<<<< HEAD
-    putRequestMonitor();
-=======
     boolean worked = putRequestMonitor();
->>>>>>> 62c5eae... Fixed bugs :)
     //delRequestMonitor();
     //this.idConf = postRequestMonitor();
     //System.exit(0);
