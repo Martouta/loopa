@@ -23,9 +23,10 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
 
   @Override
   public void setConfiguration(Map<String, String> config) {
+    this.config            = config;
     counterWrongIterations = 0;
-    maxFreq                = Integer.parseInt( config.get("maxFreq") ),
-    maxFreqChangeRate      = Integer.parseInt( config.get("maxFreqChangeRate") ),
+    maxFreq                = Integer.parseInt( config.get("maxFreq") );
+    maxFreqChangeRate      = Integer.parseInt( config.get("maxFreqChangeRate") );
     iterations             = Integer.parseInt( config.get("iterations") );
   }
 
@@ -58,9 +59,6 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
   }
 
   private void doReceivedMonData(String messageTo, Map<String, String> monData) {
-    int maxFreq           = Integer.parseInt( this.config.get("maxFreq") ),
-        maxFreqChangeRate = Integer.parseInt( this.config.get("maxFreqChangeRate") ),
-        iterations        = Integer.parseInt( this.config.get("iterations") );
     ArrayList<Object> arrayObjectTimestamps = ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp");
 
     for (Object objTimestamp : arrayObjectTimestamps) {

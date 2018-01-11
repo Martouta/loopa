@@ -56,7 +56,11 @@ public class MonitoredService extends ExternalService {
 
   private void reconfigureMonitor(int newTimeSlot) {
     this.timeSlot = newTimeSlot;
+<<<<<<< HEAD
     putRequestMonitor();
+=======
+    boolean worked = putRequestMonitor();
+>>>>>>> 62c5eae... Fixed bugs :)
     //delRequestMonitor();
     //this.idConf = postRequestMonitor();
     //System.exit(0);
@@ -82,7 +86,6 @@ public class MonitoredService extends ExternalService {
     HttpURLConnection httpURLConnection = null;
     OutputStreamWriter outputStreamWriter = null;
     int newIdConf = -1;
-    String status = null;
     try {
       URL url = new URL("http://supersede.es.atos.net:8081/twitterAPI/configuration/");
       httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -95,8 +98,7 @@ public class MonitoredService extends ExternalService {
       outputStreamWriter.flush();
       String returnedDataStr = getText(httpURLConnection);
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
-      status = returnedDataJson.getString("status");
-      if (status == "success") { newIdConf = returnedDataJson.getInt("idConf"); }
+      if (returnedDataJson.getString("status").equals("success")) { newIdConf = returnedDataJson.getInt("idConf"); }
     } catch (MalformedURLException exception) {
       exception.printStackTrace();
     } catch (IOException exception) {
@@ -152,7 +154,7 @@ public class MonitoredService extends ExternalService {
       outputStreamWriter.flush();
       String returnedDataStr = getText(httpURLConnection);
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
-      worked = (returnedDataJson.getString("status") == "success");
+      worked = (returnedDataJson.getString("status").equals("success"));
     } catch (MalformedURLException exception) {
       exception.printStackTrace();
     } catch (IOException exception) {
