@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         String kafkaUrl = "147.83.192.53", kafkaTopic = "68d24960-5eff-4c14-8a8c-6d0c7f8ea5c3", keywordExpression = "Coutinho",
                 monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor";
-        int timeSlot = 40, newTimeSlot = 40, monFreq = 3, maxFreq = 45, maxFreqChangeRate = 100, iterations = 50,
+        int timeSlot = 40, newTimeSlot = 40, monFreq = 1, maxFreq = 45, maxFreqChangeRate = 100, iterations = 50,
             idConf = 20;
 
         // TODO: error management

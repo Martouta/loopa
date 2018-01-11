@@ -70,7 +70,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
       boolean workingProperly = isWorkingProperly(currentTime);
-      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + (counterWrongIterations + (workingProperly) ? 1 : 0)); // TODO remove line
+      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + (counterWrongIterations + ((workingProperly) ? 0 : 1))); // TODO remove line
       if (!workingProperly) {
         counterWrongIterations++;
         if (counterWrongIterations == iterations) {

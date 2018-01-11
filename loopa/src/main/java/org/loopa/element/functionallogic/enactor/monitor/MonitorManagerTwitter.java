@@ -35,16 +35,16 @@ public class MonitorManagerTwitter implements IMonitorManager {
     body.put("type", "getMonData");
     ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
     IMessage mRequestMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "request", body);
-    int monFreq = Integer.parseInt( this.config.get("monFreq") );
+    int monFreq = Integer.parseInt( this.config.get("monFreq") ) * 1000;
 
     Instant startTime = Instant.now();
     while (true) {
       r.doOperation(mRequestMonData);
       Instant endTime = Instant.now();
       try {
-        Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).getSeconds();
+        Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).toMillis();
         if (waitTime > 0) {
-          TimeUnit.SECONDS.sleep(waitTime);
+          TimeUnit.MILLISECONDS.sleep(waitTime);
         }
         startTime = Instant.now();
       } catch (InterruptedException e) {
