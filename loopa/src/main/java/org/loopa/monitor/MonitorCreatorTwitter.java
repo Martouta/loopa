@@ -34,7 +34,7 @@ import org.loopa.element.receiver.messageprocessor.MessageProcessor;
 import org.loopa.element.sender.ISender;
 import org.loopa.element.sender.Sender;
 import org.loopa.element.sender.messagesender.IMessageSender;
-import org.loopa.element.sender.messagesender.MessageSender;
+import org.loopa.element.sender.messagesender.MessageSenderTwitter;
 import org.loopa.generic.documents.IPolicy;
 import org.loopa.generic.documents.Policy;
 import org.loopa.generic.documents.managers.IPolicyManager;
@@ -44,7 +44,6 @@ import org.loopa.monitor.IMonitor;
 import org.loopa.monitor.Monitor;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
-import org.loopa.externalservice.ExternalService; // TODO remove in the future when refactor is done
 import org.loopa.externalservice.KafkaService;
 
 public class MonitorCreatorTwitter {
@@ -114,14 +113,7 @@ public class MonitorCreatorTwitter {
     hmpSender.put("1", kafkaServiceID);
     IPolicy sP = new Policy("senderPolicy" + monitorID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
-    IMessageSender sMS = new MessageSender() {
-      @Override
-      protected void sendMessage(IMessage message) {
-        // TODO refactor
-        ExternalService externalService = (ExternalService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
-        externalService.processRequest(message);
-      }
-    };
+    IMessageSender sMS = new MessageSenderTwitter();
     sP.addListerner(sMS);
     return new Sender("sender" + monitorID, sPM, sMS);
   }
