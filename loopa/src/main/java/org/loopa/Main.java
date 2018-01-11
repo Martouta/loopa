@@ -1,37 +1,30 @@
 import org.loopa.comm.obtaineddata.DataItemTwitter;
-import org.loopa.kafka.KafkaService;
+import org.loopa.externalservice.KafkaService;
+import org.loopa.externalservice.MonitoredService;
 import org.loopa.monitor.MonitorCreatorTwitter;
 import org.loopa.monitor.IMonitor;
 import org.loopa.analyzer.AnalyzerCreatorTwitter;
 import org.loopa.analyzer.IAnalyzer;
 
 public class Main {
-    private final static String DEFAULT_KAFKA_URL = "147.83.192.53";
-    private final static String DEFAULT_KAFKA_TOPIC_READ = "68d24960-5eff-4c14-8a8c-6d0c7f8ea5c3";
-    private final static String DEFAULT_KAFKA_TOPIC_WRITE = "defaultWrite";
-
     public static void main(String[] args) {
-        String kafkaUrl = DEFAULT_KAFKA_URL;
-        String kafkaTopicRead = DEFAULT_KAFKA_TOPIC_READ;
-        String kafkaTopicWrite = DEFAULT_KAFKA_TOPIC_WRITE;
-        if (args.length > 0) {
-          kafkaUrl = args[0];
-          if (args.length > 1) {
-            kafkaTopicRead = args[1];
-            if (args.length > 2) { kafkaTopicWrite = args[2]; }
-          }
-        }
+        String kafkaUrl = "147.83.192.53", kafkaTopic = "68d24960-5eff-4c14-8a8c-6d0c7f8ea5c3", keywordExpression = "Coutinho",
+                monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor";
+        int timeSlot = 40, monFreq = 30, maxFreq = 20, maxFreqChangeRate = 3, iterations = 2;
 
         // TODO: error management
         // TODO: mas flexible?
 
-        int monFreq = 30, maxFreq = 20, maxFreqChangeRate = 3, iterations = 2;
-        String monitorID = "MonitorTwitter", analyzerID = "AnalizerMonitor", kafkaServiceID = "kafkaService"+monitorID;
+        // TODO: ojo con los "Social..."
+        // TODO OJO con el nombre "Twitter" por todas partes!!!!
+        // TODO remove DataItem && DataItemTwitter
 
-        IMonitor monitor = MonitorCreatorTwitter.create(monitorID, monFreq);
-        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, maxFreq, maxFreqChangeRate, iterations);
-        KafkaService kafkaService = new KafkaService(kafkaServiceID, monitor, analyzer, kafkaUrl, kafkaTopicRead, kafkaTopicWrite, DataItemTwitter.class);
-        monitor.addRecipient(kafkaServiceID, kafkaService);
+        MonitoredService monitoredService = new MonitoredService("MonitoredServiceID", 11, "twitterAPI", timeSlot, kafkaUrl, kafkaTopic, keywordExpression);
+        KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite", DataItemTwitter.class);
+        IMonitor monitor = MonitorCreatorTwitter.create(monitorID, kafkaService, monFreq);
+        kafkaService.setMonitor(monitor);
+        IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, monitoredService, maxFreq, maxFreqChangeRate, iterations);
+        kafkaService.setAnalyzer(analyzer);
 
         MonitorCreatorTwitter.startMonitoring(monitor);
     }

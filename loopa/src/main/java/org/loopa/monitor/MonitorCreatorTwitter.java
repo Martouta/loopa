@@ -44,12 +44,16 @@ import org.loopa.monitor.IMonitor;
 import org.loopa.monitor.Monitor;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
-import org.loopa.kafka.KafkaService;
+import org.loopa.externalservice.ExternalService; // TODO remove in the future when refactor is done
+import org.loopa.externalservice.KafkaService;
 
 public class MonitorCreatorTwitter {
-  public static IMonitor create(String monitorID, int monFreq) {
-    return new Monitor(monitorID, createReceiver(monitorID), createLogicSelector(monitorID), createFunctionalLogic(monitorID, monFreq),
-                      createAdaptationLogic(monitorID), createMessageComposer(monitorID), createSender(monitorID), createKnowledgeManager(monitorID));
+  public static IMonitor create(String monitorID, KafkaService kafkaService, int monFreq) {
+    String ksID = kafkaService.getID();
+    IMonitor monitor = new Monitor(monitorID, createReceiver(monitorID), createLogicSelector(monitorID), createFunctionalLogic(monitorID, monFreq),
+                      createAdaptationLogic(monitorID), createMessageComposer(monitorID, ksID), createSender(monitorID, ksID), createKnowledgeManager(monitorID));
+    monitor.addRecipient(ksID, kafkaService);
+    return monitor;
 	}
 
   public static void startMonitoring(IMonitor monitor){
@@ -91,11 +95,11 @@ public class MonitorCreatorTwitter {
     return new FunctionalLogic("functionalLogic" + monitorID, flPM, flE);
   }
 
-  private static IMessageComposer createMessageComposer(String monitorID) {
+  private static IMessageComposer createMessageComposer(String monitorID, String kafkaServiceID) {
     HashMap hmpMessageComposer = new HashMap<String, String>();
     hmpMessageComposer.put("1", "sender" + monitorID);
-    hmpMessageComposer.put("getMonData", "kafkaService" + monitorID);
-    hmpMessageComposer.put("receivedMonData", "kafkaService" + monitorID);
+    hmpMessageComposer.put("getMonData", kafkaServiceID);
+    hmpMessageComposer.put("receivedMonData", kafkaServiceID);
     IPolicy mcP = new Policy("messageComposerPolicy" + monitorID, hmpMessageComposer);
     IPolicyManager mcPM = new PolicyManager(mcP);
     IDataFormatter mcDF = new DataFormatter();
@@ -105,16 +109,17 @@ public class MonitorCreatorTwitter {
     return new MessageComposer("messageComposer" + monitorID, mcPM, mcDF, mcMC);
   }
 
-  private static ISender createSender(String monitorID) {
+  private static ISender createSender(String monitorID, String kafkaServiceID) {
     HashMap hmpSender = new HashMap<String, String>();
-    hmpSender.put("1", "kafkaService" + monitorID);
+    hmpSender.put("1", kafkaServiceID);
     IPolicy sP = new Policy("senderPolicy" + monitorID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
     IMessageSender sMS = new MessageSender() {
       @Override
       protected void sendMessage(IMessage message) {
-        KafkaService ks = (KafkaService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
-        ks.processRequest(message);
+        // TODO refactor
+        ExternalService externalService = (ExternalService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
+        externalService.processRequest(message);
       }
     };
     sP.addListerner(sMS);

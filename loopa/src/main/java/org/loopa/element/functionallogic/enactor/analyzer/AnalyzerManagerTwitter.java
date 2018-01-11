@@ -1,6 +1,5 @@
 package org.loopa.element.functionallogic.enactor.analyzer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
@@ -20,11 +19,14 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
   private ILoopAElementComponent component;
   private Instant lastTime;
   private Long lastTimeElapsed;
-  private int counterWrongIterations = 0;
+  private int counterWrongIterations, maxFreq, maxFreqChangeRate, iterations;
 
   @Override
   public void setConfiguration(Map<String, String> config) {
-    this.config = config;
+    counterWrongIterations = 0;
+    maxFreq                = Integer.parseInt( config.get("maxFreq") ),
+    maxFreqChangeRate      = Integer.parseInt( config.get("maxFreqChangeRate") ),
+    iterations             = Integer.parseInt( config.get("iterations") );
   }
 
   @Override
@@ -41,8 +43,6 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     boolean workingProperly = true;
     if (lastTime != null) {
       Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
-      System.out.println("lastTime: " + lastTime + " | currentTime: " + currentTime);
-      System.out.println("lastTimeElapsed: " + lastTimeElapsed + " | timeElapsed: " +  timeElapsed);
 
       if(timeElapsed > maxFreq) {
         workingProperly = false;
@@ -62,18 +62,16 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
         maxFreqChangeRate = Integer.parseInt( this.config.get("maxFreqChangeRate") ),
         iterations        = Integer.parseInt( this.config.get("iterations") );
     ArrayList<Object> arrayObjectTimestamps = ObtainedData.getValuesFromFieldnameInHashMap(monData, "searchTimeStamp");
-    System.out.println("Lo que convierto: " + arrayObjectTimestamps);
+
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
       boolean workingProperly = isWorkingProperly(currentTime, maxFreq, maxFreqChangeRate);
       if (!workingProperly) { counterWrongIterations++; }
-      System.out.println("isWorkingProperly: " + workingProperly + " - " + counterWrongIterations);
-      System.out.println("maxFreq: " + maxFreq + " , maxFreqChangeRate: " + maxFreqChangeRate + " , iterations: " + iterations);
       if (counterWrongIterations == iterations) {
-        System.out.println("Llega al IF");
         counterWrongIterations = 0;
         Map<String, String> body = new HashMap<String, String>();
         body.put("type", "failedMonData");
+        body.put("timeSlot", (maxFreq - 3) + ""); // TODO modificar! esta en fase de pruebas xD
         ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
         IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
         r.doOperation(mResponseMonData);

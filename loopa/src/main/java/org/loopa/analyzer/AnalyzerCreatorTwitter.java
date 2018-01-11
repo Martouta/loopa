@@ -44,12 +44,16 @@ import org.loopa.analyzer.IAnalyzer;
 import org.loopa.analyzer.Analyzer;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
-import org.loopa.kafka.KafkaService;
+import org.loopa.externalservice.ExternalService; // TODO remove in the future when refactor is done
+import org.loopa.externalservice.MonitoredService;
 
 public class AnalyzerCreatorTwitter {
-  public static IAnalyzer create(String analyzerID, int maxFreq, int maxFreqChangeRate, int iterations) {
-    return new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations),
-                      createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID), createKnowledgeManager(analyzerID));
+  public static IAnalyzer create(String analyzerID, MonitoredService monitoredService, int maxFreq, int maxFreqChangeRate, int iterations) {
+    String msID = monitoredService.getID();
+    IAnalyzer analyzer = new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations),
+                      createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID, msID), createKnowledgeManager(analyzerID));
+    analyzer.addRecipient(msID, monitoredService);
+    return analyzer;
 	}
 
   private static IReceiver createReceiver(String analyzerID){
@@ -99,18 +103,17 @@ public class AnalyzerCreatorTwitter {
     return new MessageComposer("messageComposer" + analyzerID, mcPM, mcDF, mcMC);
   }
 
-  private static ISender createSender(String analyzerID) {
+  private static ISender createSender(String analyzerID, String monitoredServiceID) {
     HashMap hmpSender = new HashMap<String, String>();
-    // hmpSender.put("1", "kafkaService" + analyzerID); // TODO
+    hmpSender.put("1", monitoredServiceID);
     IPolicy sP = new Policy("senderPolicy" + analyzerID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
     IMessageSender sMS = new MessageSender() {
       @Override
       protected void sendMessage(IMessage message) {
-        // KafkaService ks = (KafkaService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
-        // ks.processRequest(message);
-        // TODO
-        System.out.println("En Analyzer->Sender->sendMessage. TODO implementarlo :)");
+        // TODO refactor
+        ExternalService externalService = (ExternalService) this.getComponent().getComponentRecipients().get(message.getMessageTo());
+        externalService.processRequest(message);
       }
     };
     sP.addListerner(sMS);

@@ -1,4 +1,4 @@
-package org.loopa.kafka;
+package org.loopa.externalservice;
 
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
@@ -29,9 +29,8 @@ import org.loopa.comm.message.Message;
 import org.loopa.element.receiver.IReceiver;
 import org.loopa.comm.obtaineddata.*;
 
-public class KafkaService {
-    private String ksID;
-    private String kafkaUrl;
+public class KafkaService extends ExternalService {
+    private String kafkaEndpoint;
     private String kafkaTopicRead;
     private String kafkaTopicWrite;
     private Class classDataItemType;
@@ -39,15 +38,21 @@ public class KafkaService {
     private IAnalyzer analyzer;
     private KafkaConsumer<String, String> consumer;
 
-    public KafkaService(String id, IMonitor monitor, IAnalyzer analyzer, String url, String topicRead, String topicWrite, Class classDataItemType) {
-        ksID = id;
-        this.monitor = monitor;
-        this.analyzer = analyzer;
-        kafkaUrl = url;
+    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite, Class classDataItemType) {
+        super(id);
+        this.kafkaEndpoint = kafkaEndpoint;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
         this.classDataItemType = classDataItemType;
         createConsumer();
+    }
+
+    public void setMonitor(IMonitor monitor) {
+        this.monitor = monitor;
+    }
+
+    public void setAnalyzer(IAnalyzer analyzer) {
+        this.analyzer = analyzer;
     }
 
     private void createConsumer() {
@@ -60,7 +65,7 @@ public class KafkaService {
         String groupID = this.classDataItemType.getSimpleName().replaceAll("DataItem","");
         properties.put("group.id", groupID);
 
-        properties.put("bootstrap.servers", kafkaUrl+":9092");
+        properties.put("bootstrap.servers", kafkaEndpoint);
         properties.put("enable.auto.commit", "false");
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
@@ -70,7 +75,7 @@ public class KafkaService {
 
     private Properties createProducerProperties() {
         Properties properties = new Properties();
-        properties.put("metadata.broker.list", kafkaUrl+":9092");
+        properties.put("metadata.broker.list", kafkaEndpoint);
         properties.put("serializer.class", "kafka.serializer.StringEncoder");
         properties.put("request.required.acks", "1");
         return properties;
@@ -91,7 +96,7 @@ public class KafkaService {
     }
 
     private void sendToAnalyzer(IMessage monitorMessage, IReceiver receiver) {
-      IMessage analyzerMessage = new Message(this.ksID, receiver.getComponentId(), 1, "request", monitorMessage.getMessageBody());
+      IMessage analyzerMessage = new Message(getID(), receiver.getComponentId(), 1, "request", monitorMessage.getMessageBody());
       receiver.doOperation(analyzerMessage);
     }
 
@@ -118,7 +123,7 @@ public class KafkaService {
             ConsumerRecord<String, String> currentRecord = listRecords.get(i);
             arrayObtainedDatas.add( getObtainedDataFromKafkaRecord(currentRecord) );
           }
-          receiver.doOperation(ObtainedData.toMessage(arrayObtainedDatas, this.ksID, receiver.getComponentId(), 1, "response"));
+          receiver.doOperation(ObtainedData.toMessage(arrayObtainedDatas, getID(), receiver.getComponentId(), 1, "response"));
         }
         consumer.commitSync();
     }
@@ -133,20 +138,6 @@ public class KafkaService {
       Timestamp searchTimeStamp = Timestamp.valueOf( twitterData.getString("searchTimeStamp") );
       ObtainedData od = new ObtainedData(configId, numDataItems, idOutput, searchTimeStamp);
       JSONArray dataItemsArray = twitterData.getJSONArray("DataItems");
-      try {
-        Method fromJSONObjectMethod = classDataItemType.getMethod("fromJSONObject", JSONObject.class);
-        for (int i = 0; i < numDataItems; i++) {
-          JSONObject jsonDataItem = (JSONObject) dataItemsArray.get(0);
-          DataItem dataItem = (DataItem) fromJSONObjectMethod.invoke(null, jsonDataItem);
-          od.addDataItem(dataItem);
-        }
-      } catch (IllegalAccessException e) {
-        System.err.println("IllegalAccessException: " + e.getMessage());
-      } catch (NoSuchMethodException e) {
-        System.err.println("NoSuchMethodException: " + e.getMessage());
-      } catch (InvocationTargetException e) {
-        System.err.println("InvocationTargetException: " + e.getMessage());
-      }
 
       return od;
     }
