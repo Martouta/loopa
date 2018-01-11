@@ -48,9 +48,9 @@ import org.loopa.externalservice.ExternalService; // TODO remove in the future w
 import org.loopa.externalservice.MonitoredService;
 
 public class AnalyzerCreatorTwitter {
-  public static IAnalyzer create(String analyzerID, MonitoredService monitoredService, int maxFreq, int maxFreqChangeRate, int iterations) {
+  public static IAnalyzer create(String analyzerID, MonitoredService monitoredService, int maxFreq, int maxFreqChangeRate, int iterations, int timeSlot) {
     String msID = monitoredService.getID();
-    IAnalyzer analyzer = new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations),
+    IAnalyzer analyzer = new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations, timeSlot),
                       createAdaptationLogic(analyzerID), createMessageComposer(analyzerID), createSender(analyzerID, msID), createKnowledgeManager(analyzerID));
     analyzer.addRecipient(msID, monitoredService);
     return analyzer;
@@ -76,12 +76,13 @@ public class AnalyzerCreatorTwitter {
     return new LogicSelector("logicSelector" + analyzerID, lsPM, lsMD);
   }
 
-  private static IFunctionalLogic createFunctionalLogic(String analyzerID, int maxFreq, int maxFreqChangeRate, int iterations) {
+  private static IFunctionalLogic createFunctionalLogic(String analyzerID, int maxFreq, int maxFreqChangeRate, int iterations, int timeSlot) {
     HashMap hmpFunctionalLogic = new HashMap<String, String>();
     hmpFunctionalLogic.put("1", "messageComposer" + analyzerID);
     hmpFunctionalLogic.put("maxFreq", Integer.toString(maxFreq));
     hmpFunctionalLogic.put("maxFreqChangeRate", Integer.toString(maxFreqChangeRate));
     hmpFunctionalLogic.put("iterations", Integer.toString(iterations));
+    hmpFunctionalLogic.put("timeSlot", Integer.toString(timeSlot));
     IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
     IAnalyzerManager am = new AnalyzerManagerTwitter();

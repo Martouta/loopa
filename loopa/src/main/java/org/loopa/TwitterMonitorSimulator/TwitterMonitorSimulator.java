@@ -34,9 +34,9 @@ public class TwitterMonitorSimulator {
                 numMessages++;
                 try {
                   Instant endTime = Instant.now();
-                  Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).toMillis();
+                  Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).getSeconds();
                   if (waitTime > 0) {
-                    TimeUnit.MILLISECONDS.sleep(waitTime);
+                    TimeUnit.SECONDS.sleep(waitTime);
                   }
                   startTime = Instant.now();
                 } catch (InterruptedException e) {

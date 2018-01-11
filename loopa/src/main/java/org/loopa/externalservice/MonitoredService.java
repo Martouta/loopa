@@ -46,20 +46,20 @@ public class MonitoredService extends ExternalService {
       String type = message.getMessageType();
       switch (type) {
       case "response":
-        int timeSlot = Integer.parseInt( message.getMessageBody().get("timeSlot") );
-        reconfigureMonitor(timeSlot);
+        int newTimeSlot = Integer.parseInt( message.getMessageBody().get("timeSlot") );
+        if (newTimeSlot != -1) { this.timeSlot = newTimeSlot; }
+        reconfigureMonitor();
         break;
       default:
         System.err.println("Invalid type code in processRequest");
       }
   }
 
-  private void reconfigureMonitor(int newTimeSlot) {
-    this.timeSlot = newTimeSlot;
-    boolean worked = putRequestMonitor();
-    //delRequestMonitor();
-    //this.idConf = postRequestMonitor();
-    //System.exit(0);
+  private void reconfigureMonitor() {
+    delRequestMonitor();
+    this.idConf = postRequestMonitor();
+    System.out.println("new Monitor idConf: " + idConf); // TODO remove line
+    System.exit(0); // TODO remove this line
   }
 
   private void delRequestMonitor() {

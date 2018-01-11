@@ -42,9 +42,9 @@ public class MonitorManagerTwitter implements IMonitorManager {
       r.doOperation(mRequestMonData);
       Instant endTime = Instant.now();
       try {
-        Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).toMillis();
+        Long waitTime = Long.valueOf(monFreq) - Duration.between(startTime, endTime).getSeconds();
         if (waitTime > 0) {
-          TimeUnit.MILLISECONDS.sleep(waitTime);
+          TimeUnit.SECONDS.sleep(waitTime);
         }
         startTime = Instant.now();
       } catch (InterruptedException e) {

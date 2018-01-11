@@ -19,7 +19,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
   private ILoopAElementComponent component;
   private Instant lastTime;
   private Long lastTimeElapsed;
-  private int counterWrongIterations, maxFreq, maxFreqChangeRate, iterations;
+  private int counterWrongIterations, maxFreq, maxFreqChangeRate, iterations, timeSlot;
 
   @Override
   public void setConfiguration(Map<String, String> config) {
@@ -28,6 +28,9 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     maxFreq                = Integer.parseInt( config.get("maxFreq") );
     maxFreqChangeRate      = Integer.parseInt( config.get("maxFreqChangeRate") );
     iterations             = Integer.parseInt( config.get("iterations") );
+
+    String strTimeSlot = config.get("timeSlot");
+    timeSlot = (strTimeSlot != null) ? Integer.parseInt(strTimeSlot) : -1;
   }
 
   @Override
@@ -43,7 +46,8 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
   private boolean isWorkingProperly(Instant currentTime, int maxFreq, int maxFreqChangeRate) {
     boolean workingProperly = true;
     if (lastTime != null) {
-      Long timeElapsed = Duration.between(lastTime, currentTime).toMillis();
+      System.out.println("llastTime: " + lastTime + " & currentTime: " + currentTime); // TODO remove line
+      Long timeElapsed = Duration.between(lastTime, currentTime).getSeconds();
 
       if(timeElapsed > maxFreq) {
         workingProperly = false;
@@ -52,6 +56,7 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
         lastTimeElapsed = timeElapsed;
         workingProperly = (Math.abs(ratio) <= maxFreqChangeRate);
       }
+      System.out.println("lastTimeElapsed: " + lastTimeElapsed + " & timeElapsed: " + timeElapsed); // TODO remove line
       lastTimeElapsed = timeElapsed;
     }
     lastTime = currentTime;
@@ -66,10 +71,11 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
       boolean workingProperly = isWorkingProperly(currentTime, maxFreq, maxFreqChangeRate);
       if (!workingProperly) { counterWrongIterations++; }
       if (counterWrongIterations == iterations) {
+        System.out.println("llega al IF"); // TODO remove line
         counterWrongIterations = 0;
         Map<String, String> body = new HashMap<String, String>();
         body.put("type", "failedMonData");
-        body.put("timeSlot", (maxFreq - 3) + ""); // TODO modificar! esta en fase de pruebas xD
+        body.put("timeSlot", Integer.toString(timeSlot));
         ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
         IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
         r.doOperation(mResponseMonData);
