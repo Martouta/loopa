@@ -70,10 +70,9 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
       boolean workingProperly = isWorkingProperly(currentTime);
-      System.out.println("isWorkingProperly: " + workingProperly); // TODO remove line
+      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + (counterWrongIterations + (workingProperly) ? 1 : 0)); // TODO remove line
       if (!workingProperly) {
         counterWrongIterations++;
-        System.out.println("counterWrongIterations: " + counterWrongIterations); // TODO remove line
         if (counterWrongIterations == iterations) {
           System.out.println("llega al 'reconfigurame'"); // TODO remove line
           counterWrongIterations = 0;
