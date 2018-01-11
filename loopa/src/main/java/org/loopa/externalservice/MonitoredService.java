@@ -55,11 +55,13 @@ public class MonitoredService extends ExternalService {
       }
   }
 
-  private void reconfigureMonitor() {
-    delRequestMonitor();
-    this.idConf = postRequestMonitor();
-    System.out.println("new Monitor idConf: " + idConf); // TODO remove line
-    System.exit(0); // TODO remove this line
+  private void reconfigureMonitor() { // TODO fix this
+    boolean worked = putRequestMonitor();
+    System.out.println("Ha hecho la reconfiguracion?: " + worked);
+    //delRequestMonitor();
+    //this.idConf = postRequestMonitor();
+    //System.out.println("new Monitor idConf: " + idConf);
+    System.exit(0);
   }
 
   private void delRequestMonitor() {
@@ -139,6 +141,7 @@ public class MonitoredService extends ExternalService {
     OutputStreamWriter outputStreamWriter = null;
     boolean worked = false;
     try {
+      System.out.println("Current idConf: " + idConf); // TODO remove this line
       URL url = new URL("http://supersede.es.atos.net:8081/twitterAPI/configuration/" + this.idConf);
       httpURLConnection = (HttpURLConnection) url.openConnection();
       httpURLConnection.setRequestProperty("Content-Type", "text/plain");

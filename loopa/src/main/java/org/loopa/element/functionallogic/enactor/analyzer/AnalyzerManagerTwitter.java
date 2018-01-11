@@ -43,10 +43,11 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     return this.component;
   }
 
-  private boolean isWorkingProperly(Instant currentTime, int maxFreq, int maxFreqChangeRate) {
+  private boolean isWorkingProperly(Instant currentTime) {
     boolean workingProperly = true;
     if (lastTime != null) {
-      System.out.println("llastTime: " + lastTime + " & currentTime: " + currentTime); // TODO remove line
+      System.out.println("lastTime: " + lastTime + " & currentTime: " + currentTime); // TODO remove line
+      System.out.println("maxFreq: " + maxFreq + " & maxFreqChangeRate: " + maxFreqChangeRate + " & iterations: " + iterations); // TODO remove line
       Long timeElapsed = Duration.between(lastTime, currentTime).getSeconds();
 
       if(timeElapsed > maxFreq) {
@@ -68,10 +69,11 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
 
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
-      boolean workingProperly = isWorkingProperly(currentTime, maxFreq, maxFreqChangeRate);
+      boolean workingProperly = isWorkingProperly(currentTime);
       if (!workingProperly) { counterWrongIterations++; }
+      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + counterWrongIterations); // TODO remove line
       if (counterWrongIterations == iterations) {
-        System.out.println("llega al IF"); // TODO remove line
+        System.out.println("llega al 'reconfigurame'"); // TODO remove line
         counterWrongIterations = 0;
         Map<String, String> body = new HashMap<String, String>();
         body.put("type", "failedMonData");
