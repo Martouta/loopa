@@ -21,7 +21,7 @@ public class TwitterMonitorSimulator {
 
     public static void simulate(String kafkaUrl, String topic) {
         TwitterMonitorSimulator kafkaProducer = new TwitterMonitorSimulator(kafkaUrl);
-        final int maxMessages = 5*3, timeSlot = 20;
+        final int maxMessages = 5*3, timeSlot = 20 * 1000;
 
         Thread threadAll = new Thread("ThreadSimulateTwitterAllMessages") {
           public void run(){
@@ -34,9 +34,9 @@ public class TwitterMonitorSimulator {
                 numMessages++;
                 try {
                   Instant endTime = Instant.now();
-                  Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).getSeconds();
+                  Long waitTime = Long.valueOf(timeSlot) - Duration.between(startTime, endTime).toMillis();
                   if (waitTime > 0) {
-                    TimeUnit.SECONDS.sleep(waitTime);
+                    TimeUnit.MILLISECONDS.sleep(waitTime);
                   }
                   startTime = Instant.now();
                 } catch (InterruptedException e) {
