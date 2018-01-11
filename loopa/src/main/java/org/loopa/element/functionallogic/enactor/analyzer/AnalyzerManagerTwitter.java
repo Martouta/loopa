@@ -70,17 +70,20 @@ public class AnalyzerManagerTwitter implements IAnalyzerManager {
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
       boolean workingProperly = isWorkingProperly(currentTime);
-      if (!workingProperly) { counterWrongIterations++; }
-      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + counterWrongIterations); // TODO remove line
-      if (counterWrongIterations == iterations) {
-        System.out.println("llega al 'reconfigurame'"); // TODO remove line
-        counterWrongIterations = 0;
-        Map<String, String> body = new HashMap<String, String>();
-        body.put("type", "failedMonData");
-        body.put("timeSlot", Integer.toString(timeSlot));
-        ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
-        IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
-        r.doOperation(mResponseMonData);
+      System.out.println("isWorkingProperly: " + workingProperly); // TODO remove line
+      if (!workingProperly) {
+        counterWrongIterations++;
+        System.out.println("counterWrongIterations: " + counterWrongIterations); // TODO remove line
+        if (counterWrongIterations == iterations) {
+          System.out.println("llega al 'reconfigurame'"); // TODO remove line
+          counterWrongIterations = 0;
+          Map<String, String> body = new HashMap<String, String>();
+          body.put("type", "failedMonData");
+          body.put("timeSlot", Integer.toString(timeSlot));
+          ILoopAElementComponent r = (ILoopAElementComponent) this.getComponent().getComponentRecipients().get(messageTo);
+          IMessage mResponseMonData = new Message(this.getComponent().getComponentId(), messageTo, 1, "response", body);
+          r.doOperation(mResponseMonData);
+        }
       }
     }
   }
