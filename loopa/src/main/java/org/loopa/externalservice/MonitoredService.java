@@ -56,21 +56,23 @@ public class MonitoredService extends ExternalService {
   }
 
   private void reconfigureMonitor() { // TODO fix this
-    boolean worked = putRequestMonitor();
-    System.out.println("Ha hecho la reconfiguracion?: " + worked);
-    //delRequestMonitor();
-    //this.idConf = postRequestMonitor();
-    //System.out.println("new Monitor idConf: " + idConf);
-    System.exit(0);
+    //boolean worked = putRequestMonitor();
+    //System.out.println("Ha hecho la reconfiguracion?: " + worked);
+    delRequestMonitor();
+    this.idConf = postRequestMonitor();
+    System.out.println("new Monitor idConf: " + idConf);
+    //System.exit(0);
   }
 
-  private void delRequestMonitor() {
+  private boolean delRequestMonitor() {
     HttpURLConnection httpURLConnection = null;
+    boolean worked = false;
     try {
       URL url = new URL("http://supersede.es.atos.net:8081/twitterAPI/configuration/" + this.idConf);
       httpURLConnection = (HttpURLConnection) url.openConnection();
       httpURLConnection.setRequestProperty("Content-Type", "text/plain");
       httpURLConnection.setRequestMethod("DELETE");
+      worked = (httpURLConnection.getResponseCode() == 200);
     } catch (MalformedURLException exception) {
       exception.printStackTrace();
     } catch (IOException exception) {
@@ -78,6 +80,7 @@ public class MonitoredService extends ExternalService {
     }  finally {
       if (httpURLConnection != null) { httpURLConnection.disconnect(); }
     }
+    return worked;
   }
 
   private int postRequestMonitor() {
@@ -91,10 +94,11 @@ public class MonitoredService extends ExternalService {
       httpURLConnection.setRequestMethod("POST");
       httpURLConnection.setDoInput(true);
       httpURLConnection.setDoOutput(true);
-      outputStreamWriter = new OutputStreamWriter(httpURLConnection.getOutputStream());
+      outputStreamWriter = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
       outputStreamWriter.write( this.getReconfigurationParams() );
       outputStreamWriter.flush();
       String returnedDataStr = getText(httpURLConnection);
+      System.out.println("POST body response: " + returnedDataStr); // TODO remove this line
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
       if (returnedDataJson.getString("status").equals("success")) { newIdConf = returnedDataJson.getInt("idConf"); }
     } catch (MalformedURLException exception) {
@@ -141,7 +145,6 @@ public class MonitoredService extends ExternalService {
     OutputStreamWriter outputStreamWriter = null;
     boolean worked = false;
     try {
-      System.out.println("Current idConf: " + idConf); // TODO remove this line
       URL url = new URL("http://supersede.es.atos.net:8081/twitterAPI/configuration/" + this.idConf);
       httpURLConnection = (HttpURLConnection) url.openConnection();
       httpURLConnection.setRequestProperty("Content-Type", "text/plain");
