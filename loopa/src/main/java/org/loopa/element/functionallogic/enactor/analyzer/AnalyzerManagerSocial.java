@@ -14,7 +14,7 @@ import org.loopa.generic.element.component.ILoopAElementComponent;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 
-public class AnalyzerManagerTwitter implements IAnalyzerManager {
+public class AnalyzerManagerSocial implements IAnalyzerManager {
   private Map<String, String> config = new HashMap<String, String>();
   private ILoopAElementComponent component;
   private Instant lastTime;

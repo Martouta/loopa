@@ -11,7 +11,7 @@ import org.loopa.element.functionallogic.FunctionalLogic;
 import org.loopa.element.functionallogic.IFunctionalLogic;
 import org.loopa.element.functionallogic.enactor.IFunctionalLogicEnactor;
 import org.loopa.element.functionallogic.enactor.analyzer.IAnalyzerManager;
-import org.loopa.element.functionallogic.enactor.analyzer.AnalyzerManagerTwitter;
+import org.loopa.element.functionallogic.enactor.analyzer.AnalyzerManagerSocial;
 import org.loopa.element.functionallogic.enactor.analyzer.AnalyzerFunctionalLogicEnactor;
 import org.loopa.element.knowledgemanager.IKnowledgeManager;
 import org.loopa.element.knowledgemanager.KnowledgeManager;
@@ -34,7 +34,7 @@ import org.loopa.element.receiver.messageprocessor.MessageProcessor;
 import org.loopa.element.sender.ISender;
 import org.loopa.element.sender.Sender;
 import org.loopa.element.sender.messagesender.IMessageSender;
-import org.loopa.element.sender.messagesender.MessageSenderTwitter;
+import org.loopa.element.sender.messagesender.MessageSenderSocial;
 import org.loopa.generic.documents.IPolicy;
 import org.loopa.generic.documents.Policy;
 import org.loopa.generic.documents.managers.IPolicyManager;
@@ -46,7 +46,7 @@ import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 import org.loopa.externalservice.MonitoredService;
 
-public class AnalyzerCreatorTwitter {
+public class AnalyzerCreatorSocial {
   public static IAnalyzer create(String analyzerID, MonitoredService monitoredService, int maxFreq, int maxFreqChangeRate, int iterations, int timeSlot) {
     String msID = monitoredService.getID();
     IAnalyzer analyzer = new Analyzer(analyzerID, createReceiver(analyzerID), createLogicSelector(analyzerID), createFunctionalLogic(analyzerID, maxFreq, maxFreqChangeRate, iterations, timeSlot),
@@ -84,7 +84,7 @@ public class AnalyzerCreatorTwitter {
     hmpFunctionalLogic.put("timeSlot", Integer.toString(timeSlot));
     IPolicy flP = new Policy("functionalLogicPolicy" + analyzerID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
-    IAnalyzerManager am = new AnalyzerManagerTwitter();
+    IAnalyzerManager am = new AnalyzerManagerSocial();
     IFunctionalLogicEnactor flE = new AnalyzerFunctionalLogicEnactor(am);
     flP.addListerner(flE);
     return new FunctionalLogic("functionalLogic" + analyzerID, flPM, flE);
@@ -108,7 +108,7 @@ public class AnalyzerCreatorTwitter {
     hmpSender.put("1", monitoredServiceID);
     IPolicy sP = new Policy("senderPolicy" + analyzerID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
-    IMessageSender sMS = new MessageSenderTwitter();
+    IMessageSender sMS = new MessageSenderSocial();
     sP.addListerner(sMS);
     return new Sender("sender" + analyzerID, sPM, sMS);
   }

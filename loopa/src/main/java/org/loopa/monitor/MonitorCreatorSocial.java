@@ -11,7 +11,7 @@ import org.loopa.element.functionallogic.FunctionalLogic;
 import org.loopa.element.functionallogic.IFunctionalLogic;
 import org.loopa.element.functionallogic.enactor.IFunctionalLogicEnactor;
 import org.loopa.element.functionallogic.enactor.monitor.IMonitorManager;
-import org.loopa.element.functionallogic.enactor.monitor.MonitorManagerTwitter;
+import org.loopa.element.functionallogic.enactor.monitor.MonitorManagerSocial;
 import org.loopa.element.functionallogic.enactor.monitor.MonitorFunctionalLogicEnactor;
 import org.loopa.element.knowledgemanager.IKnowledgeManager;
 import org.loopa.element.knowledgemanager.KnowledgeManager;
@@ -34,7 +34,7 @@ import org.loopa.element.receiver.messageprocessor.MessageProcessor;
 import org.loopa.element.sender.ISender;
 import org.loopa.element.sender.Sender;
 import org.loopa.element.sender.messagesender.IMessageSender;
-import org.loopa.element.sender.messagesender.MessageSenderTwitter;
+import org.loopa.element.sender.messagesender.MessageSenderSocial;
 import org.loopa.generic.documents.IPolicy;
 import org.loopa.generic.documents.Policy;
 import org.loopa.generic.documents.managers.IPolicyManager;
@@ -46,7 +46,7 @@ import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 import org.loopa.externalservice.KafkaService;
 
-public class MonitorCreatorTwitter {
+public class MonitorCreatorSocial {
   public static IMonitor create(String monitorID, KafkaService kafkaService, int monFreq) {
     String ksID = kafkaService.getID();
     IMonitor monitor = new Monitor(monitorID, createReceiver(monitorID), createLogicSelector(monitorID), createFunctionalLogic(monitorID, monFreq),
@@ -88,7 +88,7 @@ public class MonitorCreatorTwitter {
     hmpFunctionalLogic.put("monFreq", Integer.toString(monFreq));
     IPolicy flP = new Policy("functionalLogicPolicy" + monitorID, hmpFunctionalLogic);
     IPolicyManager flPM = new PolicyManager(flP);
-    IMonitorManager mm = new MonitorManagerTwitter();
+    IMonitorManager mm = new MonitorManagerSocial();
     IFunctionalLogicEnactor flE = new MonitorFunctionalLogicEnactor(mm);
     flP.addListerner(flE);
     return new FunctionalLogic("functionalLogic" + monitorID, flPM, flE);
@@ -113,7 +113,7 @@ public class MonitorCreatorTwitter {
     hmpSender.put("1", kafkaServiceID);
     IPolicy sP = new Policy("senderPolicy" + monitorID, hmpSender);
     IPolicyManager sPM = new PolicyManager(sP);
-    IMessageSender sMS = new MessageSenderTwitter();
+    IMessageSender sMS = new MessageSenderSocial();
     sP.addListerner(sMS);
     return new Sender("sender" + monitorID, sPM, sMS);
   }

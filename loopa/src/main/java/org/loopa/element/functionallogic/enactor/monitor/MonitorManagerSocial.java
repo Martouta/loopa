@@ -11,7 +11,7 @@ import org.loopa.generic.element.component.ILoopAElementComponent;
 import org.loopa.comm.message.IMessage;
 import org.loopa.comm.message.Message;
 
-public class MonitorManagerTwitter implements IMonitorManager {
+public class MonitorManagerSocial implements IMonitorManager {
   private Map<String, String> config = new HashMap<String, String>();
   private ILoopAElementComponent component;
 
