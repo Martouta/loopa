@@ -13,7 +13,6 @@ import org.loopa.element.receiver.IReceiver;
 public class ObtainedData {
     private int configId;
     private int numDataItems;
-    private ArrayList<DataItem> dataItems;
     private int idOutput;
     private Timestamp searchTimeStamp;
     private static String splitRegexPattern = ";";
@@ -21,18 +20,7 @@ public class ObtainedData {
     /**
   	* ObtainedData constructor
   	*/
-  	public ObtainedData() { this.dataItems = new ArrayList(); }
-
-    /**
-  	* ObtainedData constructor
-  	*/
-  	public ObtainedData(int configId, int numDataItems, ArrayList<DataItem> dataItems, int idOutput, Timestamp searchTimeStamp) {
-    		this.configId = configId;
-    		this.numDataItems = numDataItems;
-    		this.dataItems = dataItems;
-    		this.idOutput = idOutput;
-    		this.searchTimeStamp = searchTimeStamp;
-  	}
+  	private ObtainedData() {}
 
     /**
   	* ObtainedData constructor
@@ -40,14 +28,9 @@ public class ObtainedData {
   	public ObtainedData(int configId, int numDataItems, int idOutput, Timestamp searchTimeStamp) {
     		this.configId = configId;
     		this.numDataItems = numDataItems;
-    		this.dataItems = new ArrayList();
     		this.idOutput = idOutput;
     		this.searchTimeStamp = searchTimeStamp;
   	}
-
-    public void addDataItem(DataItem dataItem) {
-        dataItems.add(dataItem);
-    }
 
   	/**
   	* Create string representation of ObtainedData for printing
@@ -55,7 +38,7 @@ public class ObtainedData {
   	*/
   	@Override
   	public String toString() {
-  		  return "ObtainedData [configId=" + configId + ", numDataItems=" + numDataItems + ", DataItems=" + dataItems.toString() + ", idOutput=" + idOutput + ", searchTimeStamp=" + searchTimeStamp + "]";
+  		  return "ObtainedData [configId=" + configId + ", numDataItems=" + numDataItems + ", idOutput=" + idOutput + ", searchTimeStamp=" + searchTimeStamp + "]";
   	}
 
     public IMessage toMessage(String from, String to, int code, String type){
@@ -79,7 +62,7 @@ public class ObtainedData {
       return arrayRealType;
     }
 
-    private static HashMap<String, String> getFieldsHashMap(ArrayList<ObtainedData> arrayObtainedData) { // so far it does it without the attributes of the tweet itself because we don't use it
+    private static HashMap<String, String> getFieldsHashMap(ArrayList<ObtainedData> arrayObtainedData) {
       HashMap<String, String> hmBodyMessage = arrayObtainedData.get(0).getFieldsHashMap(); // initialized with the first obtainedData
       hmBodyMessage.put("type", "setMonData");
       int totalRecords = arrayObtainedData.size();
@@ -97,7 +80,7 @@ public class ObtainedData {
       return hmBodyMessage;
     }
 
-    private HashMap<String, String> getFieldsHashMap(){ // so far it does it without the attributes of the tweet itself because we don't use it
+    private HashMap<String, String> getFieldsHashMap() {
       HashMap<String, String> hmBodyMessage = new HashMap();
       hmBodyMessage.put("type", "setMonData");
       try {
@@ -110,7 +93,7 @@ public class ObtainedData {
       return hmBodyMessage;
     }
 
-    public static ObtainedData fromMessage(IMessage message) { // so far it does it without the attributes of the tweet itself because we don't use it
+    public static ObtainedData fromMessage(IMessage message) {
         Map<String, String> hmBodyMessage = message.getMessageBody();
         ObtainedData od = new ObtainedData();
 
@@ -122,7 +105,7 @@ public class ObtainedData {
         return od;
     }
 
-    private static void setValueToField(ObtainedData od, Field field, String value) { // so far it does it without the attributes of the tweet itself because we don't use it
+    private static void setValueToField(ObtainedData od, Field field, String value) {
         try {
           field.set(od, convertValueFromStringToRealType(field, value));
         } catch (IllegalAccessException e) {
@@ -130,12 +113,12 @@ public class ObtainedData {
         }
     }
 
-    private static Object convertValueFromStringToRealType(Field field, String strValue) { // so far it does it without the attributes of the tweet itself because we don't use it
+    private static Object convertValueFromStringToRealType(Field field, String strValue) {
         Object convertedValue = null;
         try {
             if (int.class.equals(field.getType())) {
                 convertedValue = Integer.parseInt(strValue);
-            } else if(field.getName() != "dataItems") {
+            } else {
                 Method parseMethod = field.getType().getMethod("valueOf", String.class);
                 convertedValue = parseMethod.invoke(field, strValue);
             }

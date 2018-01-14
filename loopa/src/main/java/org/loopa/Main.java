@@ -1,4 +1,3 @@
-import org.loopa.comm.obtaineddata.DataItemTwitter;
 import org.loopa.externalservice.KafkaService;
 import org.loopa.externalservice.MonitoredService;
 import org.loopa.monitor.MonitorCreatorTwitter;
@@ -18,10 +17,9 @@ public class Main {
 
         // TODO: ojo con los "Social..."
         // TODO OJO con el nombre "Twitter" por todas partes!!!!
-        // TODO remove DataItem && DataItemTwitter
 
         MonitoredService monitoredService = new MonitoredService("MonitoredServiceID", idConf, "TwitterAPI", timeSlot, kafkaUrl, kafkaTopic, keywordExpression);
-        KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite", DataItemTwitter.class);
+        KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite");
         IMonitor monitor = MonitorCreatorTwitter.create(monitorID, kafkaService, monFreq);
         kafkaService.setMonitor(monitor);
         IAnalyzer analyzer = AnalyzerCreatorTwitter.create(analyzerID, monitoredService, maxFreq, maxFreqChangeRate, iterations, newTimeSlot);

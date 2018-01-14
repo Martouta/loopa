@@ -33,17 +33,15 @@ public class KafkaService extends ExternalService {
     private String kafkaEndpoint;
     private String kafkaTopicRead;
     private String kafkaTopicWrite;
-    private Class classDataItemType;
     private IMonitor monitor;
     private IAnalyzer analyzer;
     private KafkaConsumer<String, String> consumer;
 
-    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite, Class classDataItemType) {
+    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite) {
         super(id);
         this.kafkaEndpoint = kafkaEndpoint;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
-        this.classDataItemType = classDataItemType;
         createConsumer();
     }
 
@@ -62,7 +60,7 @@ public class KafkaService extends ExternalService {
 
     private Properties createConsumerProperties() {
         Properties properties = new Properties();
-        String groupID = this.classDataItemType.getSimpleName().replaceAll("DataItem","");
+        String groupID = "monitoringservice";
         properties.put("group.id", groupID);
 
         properties.put("bootstrap.servers", kafkaEndpoint);
@@ -136,9 +134,6 @@ public class KafkaService extends ExternalService {
       int numDataItems = twitterData.getInt("numDataItems");
       int idOutput = twitterData.getInt("idOutput");
       Timestamp searchTimeStamp = Timestamp.valueOf( twitterData.getString("searchTimeStamp") );
-      ObtainedData od = new ObtainedData(configId, numDataItems, idOutput, searchTimeStamp);
-      JSONArray dataItemsArray = twitterData.getJSONArray("DataItems");
-
-      return od;
+      return new ObtainedData(configId, numDataItems, idOutput, searchTimeStamp);
     }
 }
