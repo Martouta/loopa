@@ -97,10 +97,9 @@ public class MonitoredService extends ExternalService {
       outputStreamWriter.write( this.getReconfigurationParams() );
       outputStreamWriter.flush();
       String returnedDataStr = getText(httpURLConnection);
-      System.out.println("POST body response: " + returnedDataStr); // TODO remove this line
+      System.out.println("POST body response: " + returnedDataStr);
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
       if (returnedDataJson.getString("status").equals("success")) { newIdConf = returnedDataJson.getInt("idConf"); }
-      else { System.err.println("POST error: " + returnedDataStr); }
     } catch (MalformedURLException e) {
       e.printStackTrace();
       System.exit(0);
