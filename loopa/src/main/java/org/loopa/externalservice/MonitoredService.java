@@ -100,6 +100,7 @@ public class MonitoredService extends ExternalService {
       System.out.println("POST body response: " + returnedDataStr); // TODO remove this line
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
       if (returnedDataJson.getString("status").equals("success")) { newIdConf = returnedDataJson.getInt("idConf"); }
+      else { System.err.println("POST error: " + returnedDataStr); }
     } catch (MalformedURLException e) {
       e.printStackTrace();
       System.exit(0);
@@ -140,43 +141,6 @@ public class MonitoredService extends ExternalService {
     in.close();
 
     return response.toString();
-  }
-
-  private boolean putRequestMonitor() {
-    HttpURLConnection httpURLConnection = null;
-    OutputStreamWriter outputStreamWriter = null;
-    boolean worked = false;
-    try {
-      URL url = new URL("http://supersede.es.atos.net:8081/twitterAPI/configuration/" + this.idConf);
-      httpURLConnection = (HttpURLConnection) url.openConnection();
-      httpURLConnection.setRequestProperty("Content-Type", "text/plain");
-      httpURLConnection.setRequestMethod("PUT");
-      httpURLConnection.setDoInput(true);
-      httpURLConnection.setDoOutput(true);
-      outputStreamWriter = new OutputStreamWriter(httpURLConnection.getOutputStream(), "UTF-8");
-      outputStreamWriter.write( this.getReconfigurationParams() );
-      outputStreamWriter.flush();
-      String returnedDataStr = getText(httpURLConnection);
-      JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
-      worked = (returnedDataJson.getString("status").equals("success"));
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-      System.exit(0);
-    } catch (IOException e) {
-      e.printStackTrace();
-      System.exit(0);
-    }  finally {
-      if (outputStreamWriter != null) {
-        try {
-          outputStreamWriter.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-          System.exit(0);
-        }
-      }
-      if (httpURLConnection != null) { httpURLConnection.disconnect(); }
-    }
-    return worked;
   }
 
   private String getReconfigurationParams(){
