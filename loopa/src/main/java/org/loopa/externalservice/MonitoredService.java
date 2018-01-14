@@ -70,10 +70,12 @@ public class MonitoredService extends ExternalService {
       httpURLConnection.setRequestProperty("Content-Type", "text/plain");
       httpURLConnection.setRequestMethod("DELETE");
       worked = (httpURLConnection.getResponseCode() == 200);
-    } catch (MalformedURLException exception) {
-      exception.printStackTrace();
-    } catch (IOException exception) {
-      exception.printStackTrace();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      System.exit(0);
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(0);
     }  finally {
       if (httpURLConnection != null) { httpURLConnection.disconnect(); }
     }
@@ -98,16 +100,19 @@ public class MonitoredService extends ExternalService {
       System.out.println("POST body response: " + returnedDataStr); // TODO remove this line
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
       if (returnedDataJson.getString("status").equals("success")) { newIdConf = returnedDataJson.getInt("idConf"); }
-    } catch (MalformedURLException exception) {
-      exception.printStackTrace();
-    } catch (IOException exception) {
-      exception.printStackTrace();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      System.exit(0);
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(0);
     }  finally {
       if (outputStreamWriter != null) {
         try {
           outputStreamWriter.close();
-        } catch (IOException exception) {
-          exception.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+          System.exit(0);
         }
       }
       if (httpURLConnection != null) { httpURLConnection.disconnect(); }
@@ -120,9 +125,9 @@ public class MonitoredService extends ExternalService {
     int responseCode = connection.getResponseCode();
     InputStream inputStream;
     if (200 <= responseCode && responseCode <= 299) {
-        inputStream = connection.getInputStream();
+      inputStream = connection.getInputStream();
     } else {
-        inputStream = connection.getErrorStream();
+      inputStream = connection.getErrorStream();
     }
 
     BufferedReader in = new BufferedReader( new InputStreamReader( inputStream));
@@ -154,16 +159,19 @@ public class MonitoredService extends ExternalService {
       String returnedDataStr = getText(httpURLConnection);
       JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
       worked = (returnedDataJson.getString("status").equals("success"));
-    } catch (MalformedURLException exception) {
-      exception.printStackTrace();
-    } catch (IOException exception) {
-      exception.printStackTrace();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      System.exit(0);
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(0);
     }  finally {
       if (outputStreamWriter != null) {
         try {
           outputStreamWriter.close();
-        } catch (IOException exception) {
-          exception.printStackTrace();
+        } catch (IOException e) {
+          e.printStackTrace();
+          System.exit(0);
         }
       }
       if (httpURLConnection != null) { httpURLConnection.disconnect(); }

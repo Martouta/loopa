@@ -12,8 +12,6 @@ public class Main {
         int timeSlot = 30, newTimeSlot = 25, monFreq = 1, maxFreq = 29, maxFreqChangeRate = 2, iterations = 2,
             idConf = 11;
 
-        // TODO: error management
-
         MonitoredService monitoredService = new MonitoredService("MonitoredServiceID", idConf, "SocialAPI", timeSlot, kafkaUrl, kafkaTopic, keywordExpression);
         KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite");
         IMonitor monitor = MonitorCreatorSocial.create(monitorID, kafkaService, monFreq);

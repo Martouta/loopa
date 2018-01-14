@@ -40,7 +40,8 @@ public class TwitterMonitorSimulator {
                   }
                   startTime = Instant.now();
                 } catch (InterruptedException e) {
-                  System.err.println("InterruptedException: " + e.getMessage());
+                  e.printStackTrace();
+                  System.exit(0);
                 }
             }
             producer.close();

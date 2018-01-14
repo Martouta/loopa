@@ -56,7 +56,8 @@ public class ObtainedData {
         try {
           arrayRealType.add(convertValueFromStringToRealType(ObtainedData.class.getDeclaredField(fieldKey), strValue));
         } catch (NoSuchFieldException e) {
-          System.err.println("NoSuchFieldException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         }
       }
       return arrayRealType;
@@ -74,7 +75,8 @@ public class ObtainedData {
               hmBodyMessage.put(fieldKey, hmBodyMessage.get(fieldKey) + splitRegexPattern + newValue);
           }
         } catch (IllegalAccessException e) {
-            System.err.println("IllegalAccessException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         }
       }
       return hmBodyMessage;
@@ -85,10 +87,11 @@ public class ObtainedData {
       hmBodyMessage.put("type", "setMonData");
       try {
         for (Field field : this.getClass().getDeclaredFields()) {
-            hmBodyMessage.put(field.getName(), field.get(this).toString());
+          hmBodyMessage.put(field.getName(), field.get(this).toString());
         }
       } catch (IllegalAccessException e) {
-          System.err.println("IllegalAccessException: " + e.getMessage());
+        e.printStackTrace();
+        System.exit(0);
       }
       return hmBodyMessage;
     }
@@ -98,8 +101,8 @@ public class ObtainedData {
         ObtainedData od = new ObtainedData();
 
         for (Field field : ObtainedData.class.getDeclaredFields()) {
-            String value = hmBodyMessage.get(field.getName());
-            if (value != null) { setValueToField(od, field, value); }
+          String value = hmBodyMessage.get(field.getName());
+          if (value != null) { setValueToField(od, field, value); }
         }
 
         return od;
@@ -109,7 +112,8 @@ public class ObtainedData {
         try {
           field.set(od, convertValueFromStringToRealType(field, value));
         } catch (IllegalAccessException e) {
-          System.err.println("IllegalAccessException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         }
     }
 
@@ -123,11 +127,14 @@ public class ObtainedData {
                 convertedValue = parseMethod.invoke(field, strValue);
             }
         } catch (IllegalAccessException e) {
-            System.err.println("IllegalAccessException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         } catch (NoSuchMethodException e) {
-            System.err.println("NoSuchMethodException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         } catch (InvocationTargetException e) {
-            System.err.println("InvocationTargetException: " + e.getMessage());
+          e.printStackTrace();
+          System.exit(0);
         }
         return convertedValue;
     }
