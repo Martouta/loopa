@@ -6,6 +6,8 @@ import java.sql.Timestamp;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.loopa.comm.obtaineddata.ObtainedData;
+
 public class ObtainedDataTest {
     int configId;
     int numDataItems;
