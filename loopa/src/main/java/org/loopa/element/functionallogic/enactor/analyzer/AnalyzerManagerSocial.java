@@ -46,8 +46,6 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
   private boolean isWorkingProperly(Instant currentTime) {
     boolean workingProperly = true;
     if (lastTime != null) {
-      System.out.println("lastTime: " + lastTime + " & currentTime: " + currentTime); // TODO remove line
-      System.out.println("maxFreq: " + maxFreq + " & maxFreqChangeRate: " + maxFreqChangeRate + " & iterations: " + iterations); // TODO remove line
       Long timeElapsed = Duration.between(lastTime, currentTime).getSeconds();
 
       if(timeElapsed > maxFreq) {
@@ -57,7 +55,6 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
         lastTimeElapsed = timeElapsed;
         workingProperly = (Math.abs(ratio) <= maxFreqChangeRate);
       }
-      System.out.println("lastTimeElapsed: " + lastTimeElapsed + " & timeElapsed: " + timeElapsed); // TODO remove line
       lastTimeElapsed = timeElapsed;
     }
     lastTime = currentTime;
@@ -70,11 +67,9 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
     for (Object objTimestamp : arrayObjectTimestamps) {
       Instant currentTime = ((Timestamp) objTimestamp).toInstant();
       boolean workingProperly = isWorkingProperly(currentTime);
-      System.out.println("isWorkingProperly: " + workingProperly + " & counterWrongIterations: " + (counterWrongIterations + ((workingProperly) ? 0 : 1))); // TODO remove line
       if (!workingProperly) {
         counterWrongIterations++;
         if (counterWrongIterations == iterations) {
-          System.out.println("llega al 'reconfigurame'"); // TODO remove line
           counterWrongIterations = 0;
           Map<String, String> body = new HashMap<String, String>();
           body.put("type", "failedMonData");
