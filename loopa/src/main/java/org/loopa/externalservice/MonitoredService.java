@@ -55,13 +55,10 @@ public class MonitoredService extends ExternalService {
       }
   }
 
-  private void reconfigureMonitor() { // TODO fix this
-    //boolean worked = putRequestMonitor();
-    //System.out.println("Ha hecho la reconfiguracion?: " + worked);
+  private void reconfigureMonitor() {
     delRequestMonitor();
     this.idConf = postRequestMonitor();
     System.out.println("new Monitor idConf: " + idConf);
-    //System.exit(0);
   }
 
   private boolean delRequestMonitor() {
