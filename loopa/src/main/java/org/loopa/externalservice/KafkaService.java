@@ -131,6 +131,7 @@ public class KafkaService extends ExternalService {
       JSONObject jsonDataObject  = new JSONObject(message); // json with all data
       JSONObject twitterData = jsonDataObject.getJSONObject("SocialNetworksMonitoredData");
       int configId = twitterData.getInt("confId");
+      System.out.println("KafkaService#getObtainedDataFromKafkaRecord, message with config ID: " + configId);
       int numDataItems = twitterData.getInt("numDataItems");
       int idOutput = twitterData.getInt("idOutput");
       Timestamp searchTimeStamp = Timestamp.valueOf( twitterData.getString("searchTimeStamp") );
