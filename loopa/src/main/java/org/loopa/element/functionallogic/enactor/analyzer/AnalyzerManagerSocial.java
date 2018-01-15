@@ -46,18 +46,22 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
   private boolean isWorkingProperly(Instant currentTime) {
     boolean workingProperly = true;
     if (lastTime != null) {
+      System.out.println("\nAnalyzerManagerSocial#isWorkingProperly is analyzing a new KafkaMessage");
       System.out.println("lastTime: " + lastTime + " & currentTime: " + currentTime);
       System.out.println("maxFreq: " + maxFreq + " & maxFreqChangeRate: " + maxFreqChangeRate + " & iterations: " + iterations);
       Long timeElapsed = Duration.between(lastTime, currentTime).getSeconds();
 
       if(timeElapsed > maxFreq) {
         workingProperly = false;
+        System.out.println("Working properly is False because the frecuency is bigger than the maxFreq");
       } else if(lastTimeElapsed != null){
-        Long ratio = timeElapsed - lastTimeElapsed;
+        Long rate = Math.abs(timeElapsed - lastTimeElapsed);
         lastTimeElapsed = timeElapsed;
-        workingProperly = (Math.abs(ratio) <= maxFreqChangeRate);
+        System.out.println("rate: " + rate);
+        workingProperly = (rate <= maxFreqChangeRate);
+        if (!workingProperly) { System.out.println("Working properly is False because the rate is bigger than the maxFreqChangeRate"); }
       }
-      System.out.println("lastTimeElapsed: " + lastTimeElapsed + " & timeElapsed: " + timeElapsed);
+      System.out.println("lastFrecuency: " + lastTimeElapsed + " & currentFrecuency: " + timeElapsed);
       lastTimeElapsed = timeElapsed;
     }
     lastTime = currentTime;
@@ -74,7 +78,6 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
       if (!workingProperly) {
         counterWrongIterations++;
         if (counterWrongIterations == iterations) {
-          System.out.println("llega al 'reconfigurame'");
           counterWrongIterations = 0;
           Map<String, String> body = new HashMap<String, String>();
           body.put("type", "failedMonData");
