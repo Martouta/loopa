@@ -34,6 +34,8 @@ public class MonitoredService extends ExternalService {
 		this.keywordExpression = keywordExpression;
 	}
 
+  public int getIdConf() { return idConf; }
+
   public String getKafkaEndpoint() {
 		return kafkaUrl + ":" + kafkaPort;
 	}
