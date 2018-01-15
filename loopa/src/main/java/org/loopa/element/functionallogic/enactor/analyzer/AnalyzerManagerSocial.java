@@ -53,10 +53,10 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
 
       if(timeElapsed > maxFreq) {
         workingProperly = false;
-        System.out.println("Working properly is False because the frecuency is bigger than the maxFreq");
+        System.out.println("Working properly is False because the Frequency is bigger than the maxFreq");
       } else if(lastTimeElapsed != null){
         Long rate = Math.abs(timeElapsed - lastTimeElapsed);
-        System.out.println("lastFrecuency: " + lastTimeElapsed + " & currentFrecuency: " + timeElapsed);
+        System.out.println("lastFrequency: " + lastTimeElapsed + " & currentFrequency: " + timeElapsed);
         lastTimeElapsed = timeElapsed;
         System.out.println("rate: " + rate);
         workingProperly = (rate <= maxFreqChangeRate);
