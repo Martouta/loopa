@@ -36,14 +36,14 @@ public class KafkaService extends ExternalService {
     private IMonitor monitor;
     private IAnalyzer analyzer;
     private KafkaConsumer<String, String> consumer;
-    private int filterIdConf;
+    private MonitoredService filterMonitoredService;
 
-    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite, int idConf) {
+    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite, MonitoredService monitoredService) {
         super(id);
         this.kafkaEndpoint = kafkaEndpoint;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
-        filterIdConf = idConf;
+        filterMonitoredService = monitoredService;
         createConsumer();
     }
 
@@ -122,7 +122,7 @@ public class KafkaService extends ExternalService {
           for (int i = 0; i < totalRecords; i++) {
             ConsumerRecord<String, String> currentRecord = listRecords.get(i);
             ObtainedData obtainedData = getObtainedDataFromKafkaRecord(currentRecord);
-            if (obtainedData.getConfigId() == filterIdConf) { arrayObtainedData.add( obtainedData ); }
+            if (obtainedData.getConfigId() == filterMonitoredService.getIdConf()) { arrayObtainedData.add( obtainedData ); }
           }
           if (!arrayObtainedData.isEmpty()) {
             receiver.doOperation(ObtainedData.toMessage(arrayObtainedData, getID(), receiver.getComponentId(), 1, "response"));
