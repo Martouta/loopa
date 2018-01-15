@@ -56,9 +56,13 @@ public class MonitoredService extends ExternalService {
   }
 
   private void reconfigureMonitor() {
-    delRequestMonitor();
-    this.idConf = postRequestMonitor();
-    System.out.println("new Monitor idConf: " + idConf);
+    System.out.println("It arrives to 'MonitoredService#reconfigureMonitor'");
+
+    boolean deletedCorrectly = delRequestMonitor();
+    if (deletedCorrectly) {
+      this.idConf = postRequestMonitor();
+      System.out.println("new Monitor idConf: " + idConf);
+    }
   }
 
   private boolean delRequestMonitor() {
@@ -69,7 +73,10 @@ public class MonitoredService extends ExternalService {
       httpURLConnection = (HttpURLConnection) url.openConnection();
       httpURLConnection.setRequestProperty("Content-Type", "text/plain");
       httpURLConnection.setRequestMethod("DELETE");
-      worked = (httpURLConnection.getResponseCode() == 200);
+      String returnedDataStr = getText(httpURLConnection);
+      System.out.println("DELETE body response: " + returnedDataStr);
+      JSONObject returnedDataJson = new JSONObject(returnedDataStr).getJSONObject("SocialNetworksMonitoringConfProfResult");
+      worked = (returnedDataJson.getString("status").equals("success"));
     } catch (MalformedURLException e) {
       e.printStackTrace();
       System.exit(0);

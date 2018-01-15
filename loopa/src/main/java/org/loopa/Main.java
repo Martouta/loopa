@@ -15,7 +15,7 @@ public class Main {
         if (args.length == 8) { newTimeSlot = Integer.parseInt(args[7]); }
 
         MonitoredService monitoredService = new MonitoredService("MonitoredServiceID", idConf, "TwitterAPI", timeSlot, kafkaUrl, kafkaTopic, keywordExpression);
-        KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite");
+        KafkaService kafkaService = new KafkaService("kafkaServiceID", monitoredService.getKafkaEndpoint(), monitoredService.getKafkaTopic(), "kafkaTopicWrite", idConf);
         IMonitor monitor = MonitorCreatorSocial.create(monitorID, kafkaService, monFreq);
         kafkaService.setMonitor(monitor);
         IAnalyzer analyzer = AnalyzerCreatorSocial.create(analyzerID, monitoredService, maxFreq, maxFreqChangeRate, iterations, newTimeSlot);
