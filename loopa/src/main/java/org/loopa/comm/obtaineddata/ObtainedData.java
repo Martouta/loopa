@@ -32,6 +32,8 @@ public class ObtainedData {
     		this.searchTimeStamp = searchTimeStamp;
   	}
 
+    public int getConfigId() { return configId; }
+
   	/**
   	* Create string representation of ObtainedData for printing
   	* @return

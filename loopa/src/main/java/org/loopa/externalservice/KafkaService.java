@@ -36,12 +36,14 @@ public class KafkaService extends ExternalService {
     private IMonitor monitor;
     private IAnalyzer analyzer;
     private KafkaConsumer<String, String> consumer;
+    private int filterIdConf;
 
-    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite) {
+    public KafkaService(String id, String kafkaEndpoint, String topicRead, String topicWrite, int idConf) {
         super(id);
         this.kafkaEndpoint = kafkaEndpoint;
         kafkaTopicRead = topicRead;
         kafkaTopicWrite = topicWrite;
+        filterIdConf = idConf;
         createConsumer();
     }
 
@@ -115,13 +117,16 @@ public class KafkaService extends ExternalService {
         ConsumerRecords<String, String> records = consumer.poll(0);
         if (!records.isEmpty()) {
           List<ConsumerRecord<String, String>> listRecords = records.records(new TopicPartition(this.kafkaTopicRead, 0));
-          ArrayList<ObtainedData> arrayObtainedDatas = new ArrayList();
+          ArrayList<ObtainedData> arrayObtainedData = new ArrayList();
           int totalRecords = listRecords.size();
           for (int i = 0; i < totalRecords; i++) {
             ConsumerRecord<String, String> currentRecord = listRecords.get(i);
-            arrayObtainedDatas.add( getObtainedDataFromKafkaRecord(currentRecord) );
+            ObtainedData obtainedData = getObtainedDataFromKafkaRecord(currentRecord);
+            if (obtainedData.getConfigId() == filterIdConf) { arrayObtainedData.add( obtainedData ); }
           }
-          receiver.doOperation(ObtainedData.toMessage(arrayObtainedDatas, getID(), receiver.getComponentId(), 1, "response"));
+          if (!arrayObtainedData.isEmpty()) {
+            receiver.doOperation(ObtainedData.toMessage(arrayObtainedData, getID(), receiver.getComponentId(), 1, "response"));
+          }
         }
         consumer.commitSync();
     }
