@@ -51,9 +51,9 @@ public class AnalyzerManagerSocial implements IAnalyzerManager {
       if(timeElapsed > maxFreq) {
         workingProperly = false;
       } else if(lastTimeElapsed != null){
-        Long ratio = timeElapsed - lastTimeElapsed;
+        Long rate = Math.abs(timeElapsed - lastTimeElapsed);
         lastTimeElapsed = timeElapsed;
-        workingProperly = (Math.abs(ratio) <= maxFreqChangeRate);
+        workingProperly = (rate <= maxFreqChangeRate);
       }
       lastTimeElapsed = timeElapsed;
     }
